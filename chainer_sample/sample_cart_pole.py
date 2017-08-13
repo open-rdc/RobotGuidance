@@ -41,7 +41,7 @@ class QFunction(chainer.Chain):
 obs_size = env.observation_space.shape[0]
 n_actions = env.action_space.n
 q_func = QFunction(obs_size, n_actions)
-#q_func.to_qpu()
+#q_func.to_gpu()
 
 optimizer = chainer.optimizers.Adam(eps=1e-2)
 optimizer.setup(q_func)
