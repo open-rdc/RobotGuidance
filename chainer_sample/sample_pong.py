@@ -13,7 +13,7 @@ obs = env.reset()
 env.render()
 
 class QFunction(chainer.Chain):
-    def __init__(self, n_history=1, n_action=6):
+    def __init__(self, n_history=4, n_action=6):
         initializer = chainer.initializers.HeNormal()
         super().__init__(
             l1=L.Convolution2D(n_history, 32, ksize=8, stride=4, nobias=False, initialW=initializer),
@@ -33,8 +33,10 @@ class QFunction(chainer.Chain):
         return chainerrl.action_value.DiscreteActionValue(h5)
 
 n_action = env.action_space.n
-n_history=1
+n_history=4
 q_func = QFunction(n_history, n_action)
+q_func.to_gpu()
+
 
 optimizer = chainer.optimizers.Adam(eps=1e-2)
 optimizer.setup(q_func)
@@ -54,10 +56,11 @@ agent = chainerrl.agents.DoubleDQN(
     target_update_interval=100, phi=phi)
 
 last_time = datetime.datetime.now()
-n_episodes = 1000
+n_episodes = 10000
+state = np.zeros([4,80,80])
 for i in range(1, n_episodes + 1):
-    obs = resize(rgb2gray(env.reset()),(80,80))
-    obs = obs[np.newaxis, :, :]
+#    obs = resize(rgb2gray(env.reset()),(80,80),mode='constant')
+#    obs = obs[np.newaxis, :, :]
 
     reward = 0
     done = False
@@ -65,10 +68,11 @@ for i in range(1, n_episodes + 1):
 
     while not done:
         env.render()
-        action = agent.act_and_train(obs, reward)
+        action = agent.act_and_train(state, reward)
         obs, reward, done, _ = env.step(action)
-        obs = resize(rgb2gray(obs), (80, 80))
-        obs = obs[np.newaxis, :, :]
+        obs = resize(rgb2gray(obs), (80, 80),mode='constant')
+        state = np.asanyarray([state[1], state[2], state[3], obs], dtype=np.uint8)
+#        obs = obs[np.newaxis, :, :]
 
         if reward != 0:
             R += reward
@@ -83,5 +87,5 @@ for i in range(1, n_episodes + 1):
         filename = 'agent_Breakout' + str(i)
         agent.save(filename)
 
-    agent.stop_episode_and_train(obs, reward, done)
+    agent.stop_episode_and_train(state, reward, done)
 print('Finished.')
