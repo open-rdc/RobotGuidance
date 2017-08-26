@@ -7,7 +7,7 @@ import numpy as np
 class QFunction(chainer.Chain):
     def __init__(self, n_history=4, n_action=5):
         initializer = chainer.initializers.HeNormal()
-        super().__init__(
+        super(QFunction, self).__init__(
             conv1=L.Convolution2D(n_history, 32, ksize=8, stride=4, nobias=False, initialW=initializer),
             conv2=L.Convolution2D(32, 64, ksize=3, stride=2, nobias=False, initialW=initializer),
             conv3=L.Convolution2D(64, 64, ksize=3, stride=1, nobias=False, initialW=initializer),
@@ -24,7 +24,7 @@ class QFunction(chainer.Chain):
         h5 = self.fc5(h4)
         return chainerrl.action_value.DiscreteActionValue(h5)
 
-class ReinforcementLearning():
+class reinforcement_learning:
     def __init__(self, n_history=4, n_action=5):
         self.q_func = QFunction(n_history, n_action)
         self.q_func.to_gpu()
@@ -32,7 +32,7 @@ class ReinforcementLearning():
         self.optimizer.setup(self.q_func)
         self.gamma = 0.95
         self.explorer = chainerrl.explorers.ConstantEpsilonGreedy(
-            epsilon=0.3, random_action_func=np.randint(n_action))
+            epsilon=0.3, random_action_func=np.random.randint(n_action))
         self.replay_buffer = chainerrl.replay_buffer.ReplayBuffer(capacity=10 ** 4)
         self.phi = lambda x: x.astype(np.float32, copy=False)
         self.agent = chainerrl.agents.DoubleDQN(
@@ -42,3 +42,6 @@ class ReinforcementLearning():
 
     def act_and_trains(self, obs, reward):
         action = self.agent.act_and_train(obs, reward)
+
+if __name__ == '__main__':
+    rl = reinforcement_learning()
