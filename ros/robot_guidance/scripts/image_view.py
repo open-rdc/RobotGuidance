@@ -1,4 +1,8 @@
 #!/usr/bin/env python
+from __future__ import print_function
+import roslib
+roslib.load_manifest('robot_guidance')
+import sys
 import rospy
 import cv2
 from sensor_msgs.msg import Image
@@ -7,7 +11,7 @@ from cv_bridge import CvBridge, CvBridgeError
 class image_view:
     def __init__(self):
         self.bridge = CvBridge()
-        self.image_sub = rospy.Subscriber("image_raw", Image, self.callback)
+        self.image_sub = rospy.Subscriber("/image_raw", Image, self.callback)
 
     def callback(self, data):
         try:
@@ -26,3 +30,4 @@ if __name__ == '__main__':
     except KeyboardInterrupt:
         print("Shutting down")
     cv2.destroyAllWindows()
+
