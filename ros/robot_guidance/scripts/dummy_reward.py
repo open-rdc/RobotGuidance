@@ -49,13 +49,13 @@ class dummy_reward:
             self.desired_action = 0
         else:
             rect = rects[0]
-            if (rect[3] > 300):
+            if rect[3] > 300:
                 self.desired_action = 4
             else:
                 x = rect[0] + rect[2] / 2
-                if (x < 200):
+                if x < 200:
                     self.desired_action = 1
-                elif (x > (640-200)):
+                elif x > (640-200):
                     self.desired_action = 3
                 else:
                     self.desired_action = 2
@@ -63,7 +63,11 @@ class dummy_reward:
 
     def callback_action(self, data):
         self.action = data
-        return 0
+        if self.action == self.desired_action:
+            self.reward = 1
+        else:
+            self.reward = -1
+        self.reward_pub.publish(self.reward)
 
 if __name__ == '__main__':
     dr = dummy_reward()
