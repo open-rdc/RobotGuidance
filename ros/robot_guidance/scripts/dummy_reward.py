@@ -6,8 +6,6 @@ import rospy
 import cv2
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
-#from reinforcement_learning import *
-from skimage.transform import resize
 from std_msgs.msg import Float32, Int8
 import numpy as np
 
@@ -15,7 +13,7 @@ class dummy_reward:
     def __init__(self):
         self.bridge = CvBridge()
         self.image_sub = rospy.Subscriber("/image_raw", Image, self.callback)
-        self.action_sub = rospy.Subscriber("action", Int8, self.callback_action)
+        self.action_sub = rospy.Subscriber("/action", Int8, self.callback_action)
         self.reward_pub = rospy.Publisher("reward", Float32, queue_size=10)
         self.action = 0
         self.desired_action = 0
@@ -59,14 +57,15 @@ class dummy_reward:
                     self.desired_action = 3
                 else:
                     self.desired_action = 2
-        print("desired_action: " + str(self.desired_action))
+#        print("desired_action: " + str(self.desired_action))
 
     def callback_action(self, data):
-        self.action = data
+        self.action = data.data
         if self.action == self.desired_action:
             self.reward = 1
         else:
             self.reward = -1
+        print("selected_action: " + str(self.action) + ", desired_action: " + str(self.desired_action) + ", reward: " + str(self.reward))
         self.reward_pub.publish(self.reward)
 
 if __name__ == '__main__':
