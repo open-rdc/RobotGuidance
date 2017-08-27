@@ -38,16 +38,15 @@ def main():
 	print('# unit: {}'.format(args.unit))
 	print('# Minibatch-size: {}'.format(args.batchsize))
 	print('# epoch: {}'.format(args.epoch))
-	print('')
 	#=======================chainer setting=======================
 
 	#=======================read images & labels set=======================
 	pathsAndLabels = []
-	pathsAndLabels.append(np.asarray(['./data/center/', 0]))
-	pathsAndLabels.append(np.asarray(['./data/left/', 1]))
-	pathsAndLabels.append(np.asarray(['./data/right/', 2]))
-	pathsAndLabels.append(np.asarray(['./data/near/', 3]))
-	pathsAndLabels.append(np.asarray(['./data/none/', 4]))
+	pathsAndLabels.append(np.asarray(['./train/center/', 0]))
+	pathsAndLabels.append(np.asarray(['./train/left/', 1]))
+	pathsAndLabels.append(np.asarray(['./train/right/', 2]))
+	pathsAndLabels.append(np.asarray(['./train/near/', 3]))
+	pathsAndLabels.append(np.asarray(['./train/none/', 4]))
 
 	allData = []
 	for pathAndLabel in pathsAndLabels:
@@ -57,6 +56,8 @@ def main():
 		for imgName in imagelist:
 			allData.append([imgName, label])
 	allData = np.random.permutation(allData)
+	print('Number of datas is ' + str(len(allData)))
+	print('')
 	#=======================read images & labels set=======================
 
 	#=======================set up data format=======================
@@ -87,7 +88,7 @@ def main():
 	optimizer = chainer.optimizers.Adam()
 	optimizer.setup(model)
 
-	#chainer.serializers.load_npz(args.model, model)
+	#chainer.serializers.load_npz('my_output_5.model', model)
 	#chainer.serializers.load_npz(args.optimizer, optimizer)
 
 	train_iter = chainer.iterators.SerialIterator(train, args.batchsize)

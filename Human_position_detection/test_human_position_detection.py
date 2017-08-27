@@ -11,6 +11,8 @@ import argparse
 import numpy as np
 import glob
 import alexLike
+import cv2
+
 
 def main():
 
@@ -25,11 +27,11 @@ def main():
 
 	#=======================read images & labels set=======================
 	pathsAndLabels = []
-	pathsAndLabels.append(np.asarray(['./testData/center/', 0]))
-	pathsAndLabels.append(np.asarray(['./testData/left/', 1]))
-	pathsAndLabels.append(np.asarray(['./testData/right/', 2]))
-	pathsAndLabels.append(np.asarray(['./testData/near/', 3]))
-	pathsAndLabels.append(np.asarray(['./testData/none/', 4]))
+	pathsAndLabels.append(np.asarray(['./test/center/', 0]))
+	pathsAndLabels.append(np.asarray(['./test/left/', 1]))
+	pathsAndLabels.append(np.asarray(['./test/right/', 2]))
+	pathsAndLabels.append(np.asarray(['./test/near/', 3]))
+	pathsAndLabels.append(np.asarray(['./test/none/', 4]))
 
 	allData = []
 	for pathAndLabel in pathsAndLabels:
@@ -38,7 +40,8 @@ def main():
 		imagelist = glob.glob(path + "*")
 		for imgName in imagelist:
 			allData.append([imgName, label])
-	allData = np.random.permutation(allData)
+	print('Number of datas is ' + str(len(allData)))
+	print('')
 	#=======================read images & labels set=======================
 
 	#=======================testing program=======================
@@ -50,6 +53,7 @@ def main():
 	chainer.serializers.load_npz(args.model, model)
 
 	count = 1
+	val = ['center', 'left', 'right', 'near', 'none']
 	for pathAndLabel in allData:
 		img = Image.open(pathAndLabel[0])
 		r,g,b = img.split()
@@ -67,6 +71,15 @@ def main():
 					print('image number ', count, 'is correct')
 				else:
 					print('image number', count, 'is incorrect')
+					a = imgData[0][0]
+					a = np.swapaxes(a,0,2)
+					a = np.swapaxes(a,0,1)
+					a = a*255
+					a = cv2.cvtColor(a, cv2.COLOR_BGR2RGB)
+					a = cv2.resize(a, (640, 480))
+					cv2.putText(a,val[pre_i],(550,450), cv2.FONT_HERSHEY_SIMPLEX, 1,(0,0,255),2)
+					cv2.putText(a,val[pathAndLabel[1].astype(int)],(20,450), cv2.FONT_HERSHEY_SIMPLEX, 1,(0,255,0),2)
+					cv2.imwrite('wrong/'+str(count)+'.png',a)
 		count += 1
 
 	print('correct = ', correct/len(allData)*100, '%')
