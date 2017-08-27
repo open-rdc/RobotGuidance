@@ -16,7 +16,7 @@ env.render()
 class QFunction(chainer.Chain):
     def __init__(self, n_history=4, n_action=6):
         initializer = chainer.initializers.HeNormal()
-        super().__init__(
+        super(QFunction, self).__init__(
             l1=L.Convolution2D(n_history, 32, ksize=8, stride=4, nobias=False, initialW=initializer),
             l2=L.Convolution2D(32, 64, ksize=4, stride=2, nobias=False, initialW=initializer),
             l3=L.Convolution2D(64, 64, ksize=3, stride=1, nobias=False, initialW=initializer),
