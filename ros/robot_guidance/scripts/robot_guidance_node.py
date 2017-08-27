@@ -8,9 +8,9 @@ from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
 from reinforcement_learning import *
 from skimage.transform import resize
+from std_msgs.msg import Float32
 
 import sys
-from std_msgs.msg import String
 import skimage.transform
 
 class robot_guidance_node:
@@ -18,7 +18,9 @@ class robot_guidance_node:
         self.rl = reinforcement_learning(3)
         self.bridge = CvBridge()
         self.image_sub = rospy.Subscriber("/image_raw", Image, self.callback)
+        self.reward_sub = rospy.Subscriber("reward", Float32, self.callback_reward)
         self.action = 0
+        self.reward = 0
 
     def callback(self, data):
         try:
@@ -34,8 +36,12 @@ class robot_guidance_node:
         r, g, b = cv2.split(img)
         imgobj = np.asanyarray([r,g,b])
 #        print(imgobj)
-        self.action = self.rl.act_and_trains(imgobj, 0)
+        self.action = self.rl.act_and_trains(imgobj, self.reward)
         print(self.action)
+
+    def callback_reward(self, reward):
+        self.reward = reward;
+        return 0
 
 if __name__ == '__main__':
     rg = robot_guidance_node()
