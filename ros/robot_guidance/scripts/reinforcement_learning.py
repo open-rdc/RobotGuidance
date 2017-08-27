@@ -25,7 +25,7 @@ class QFunction(chainer.Chain):
         return chainerrl.action_value.DiscreteActionValue(h5)
 
 class reinforcement_learning:
-    def __init__(self, n_history=4, n_action=5):
+    def __init__(self, n_history=1, n_action=5):
         self.q_func = QFunction(n_history, n_action)
         self.q_func.to_gpu()
         self.optimizer = chainer.optimizers.Adam(eps=1e-2)
@@ -41,7 +41,7 @@ class reinforcement_learning:
             target_update_interval=100, phi=self.phi)
 
     def act_and_trains(self, obs, reward):
-        action = self.agent.act_and_train(obs, reward)
+        self.action = self.agent.act_and_train(obs, reward)
 
 if __name__ == '__main__':
     rl = reinforcement_learning()

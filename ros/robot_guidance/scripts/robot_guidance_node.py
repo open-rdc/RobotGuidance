@@ -7,6 +7,7 @@ import cv2
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
 from reinforcement_learning import *
+from skimage.transform import resize
 
 import sys
 from std_msgs.msg import String
@@ -24,8 +25,10 @@ class robot_guidance_node:
         except CvBridgeError as e:
             print(e)
 
-        cv2.imshow("Image Windows", cv_image)
-        cv2.waitKey(3)
+        imgobj = resize(cv_image, (48, 64), mode='constant')
+        cv2.imshow("Capture Image", cv_image)
+        cv2.imshow("Image Object", imgobj)
+        cv2.waitKey(1)
 
 if __name__ == '__main__':
     rg = robot_guidance_node()
