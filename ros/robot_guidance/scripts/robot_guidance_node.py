@@ -18,6 +18,7 @@ class robot_guidance_node:
         self.rl = reinforcement_learning(3)
         self.bridge = CvBridge()
         self.image_sub = rospy.Subscriber("/image_raw", Image, self.callback)
+        self.action = 0
 
     def callback(self, data):
         try:
@@ -32,8 +33,9 @@ class robot_guidance_node:
 
         r, g, b = cv2.split(img)
         imgobj = np.asanyarray([r,g,b])
-        print(imgobj)
-        self.rl.act_and_trains(imgobj, 0)
+#        print(imgobj)
+        self.action = self.rl.act_and_trains(imgobj, 0)
+        print(self.action)
 
 if __name__ == '__main__':
     rg = robot_guidance_node()
