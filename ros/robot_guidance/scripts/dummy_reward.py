@@ -32,7 +32,8 @@ class dummy_reward:
         v = hsv[:,:, 2]
         mask = np.zeros(h.shape, dtype=np.uint8)
         mask[((h < 20) | (h > 200)) & (s > 128) & (v > 128)] = 255
-        contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        image, contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+#		contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         rects = []
         for contour in contours:
             approx = cv2.convexHull(contour)
