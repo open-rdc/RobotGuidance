@@ -70,6 +70,7 @@ for i in range(1, n_episodes + 1):
 
     while not done:
         env.render()
+        print(state)
         action = agent.act_and_train(state, reward)
         obs, reward, done, _ = env.step(action)
         obs = resize(rgb2gray(obs), (80, 80), mode='constant')

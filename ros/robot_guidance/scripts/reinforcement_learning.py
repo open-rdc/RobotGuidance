@@ -5,13 +5,13 @@ import chainer.links as L
 import numpy as np
 
 class QFunction(chainer.Chain):
-    def __init__(self, n_history=4, n_action=5):
+    def __init__(self, n_history=3, n_action=5):
         initializer = chainer.initializers.HeNormal()
         super(QFunction, self).__init__(
             conv1=L.Convolution2D(n_history, 32, ksize=8, stride=4, nobias=False, initialW=initializer),
             conv2=L.Convolution2D(32, 64, ksize=3, stride=2, nobias=False, initialW=initializer),
             conv3=L.Convolution2D(64, 64, ksize=3, stride=1, nobias=False, initialW=initializer),
-            conv4=L.Linear(3136, 512, initialW=initializer),
+            conv4=L.Linear(960, 512, initialW=initializer),
             fc5=L.Linear(512, n_action, initialW=np.zeros((n_action, 512), dtype=np.float32))
         )
 
@@ -25,14 +25,15 @@ class QFunction(chainer.Chain):
         return chainerrl.action_value.DiscreteActionValue(h5)
 
 class reinforcement_learning:
-    def __init__(self, n_history=1, n_action=5):
+    def __init__(self, n_history=3, n_action=5):
         self.q_func = QFunction(n_history, n_action)
-        self.q_func.to_gpu()
+#        self.q_func.to_gpu()
         self.optimizer = chainer.optimizers.Adam(eps=1e-2)
         self.optimizer.setup(self.q_func)
         self.gamma = 0.95
+        self.n_action = n_action
         self.explorer = chainerrl.explorers.ConstantEpsilonGreedy(
-            epsilon=0.3, random_action_func=np.random.randint(n_action))
+            epsilon=0.3, random_action_func=self.action_space_sample)
         self.replay_buffer = chainerrl.replay_buffer.ReplayBuffer(capacity=10 ** 4)
         self.phi = lambda x: x.astype(np.float32, copy=False)
         self.agent = chainerrl.agents.DoubleDQN(
@@ -42,6 +43,9 @@ class reinforcement_learning:
 
     def act_and_trains(self, obs, reward):
         self.action = self.agent.act_and_train(obs, reward)
+
+    def action_space_sample(self):
+        return np.random.randint(1,self.n_action)
 
 if __name__ == '__main__':
     rl = reinforcement_learning()
