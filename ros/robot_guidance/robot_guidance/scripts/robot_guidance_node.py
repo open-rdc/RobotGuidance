@@ -67,6 +67,7 @@ class robot_guidance_node:
                 print("action: " + move + "\x1b[6;30;41m" " reward: " + str(self.reward) + "\x1b[0m")
             self.t0 = rospy.Time.now().to_sec()
 
+            self.rl.save_agent()
 
     def callback_poten(self, data):
         self.poten = data
