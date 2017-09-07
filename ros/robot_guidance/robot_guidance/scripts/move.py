@@ -15,8 +15,8 @@ class robot_move:
 	def callback_action(self, data):
 		self.action = data.data
 
-		linear_x = 0.3
-		angular_z = 0.5
+		linear_x = 0.2
+		angular_z = 0.4
 
 		if self.action == 1:
 			angular_z = -angular_z
