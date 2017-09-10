@@ -1,0 +1,4 @@
+<launch>
+  <param name="robot_description" command="$(find xacro)/xacro.py '$(find robot_guidance_description)/urdf/icart_mini.xacro'"/>
+  <node pkg="rviz" type="rviz" name="rviz"/>
+</launch>
