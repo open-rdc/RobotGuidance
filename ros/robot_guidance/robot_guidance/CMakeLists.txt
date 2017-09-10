@@ -5,7 +5,6 @@ project(robot_guidance)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  roscpp
   rospy
   std_msgs
 )
@@ -102,7 +101,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES robot_guidance
-  CATKIN_DEPENDS roscpp rospy std_msgs
+  CATKIN_DEPENDS rospy std_msgs
   DEPENDS system_lib
 )
 
@@ -113,9 +112,9 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 # include_directories(include)
-include_directories(
-  ${catkin_INCLUDE_DIRS}
-)
+# include_directories(
+#   ${catkin_INCLUDE_DIRS}
+# )
 
 ## Declare a C++ library
 # add_library(robot_guidance
@@ -128,16 +127,16 @@ include_directories(
 # add_dependencies(robot_guidance ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Declare a C++ executable
-add_executable(robot_guidance_node src/robot_guidance_node.cpp)
+# add_executable(robot_guidance_node src/robot_guidance_node.cpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
-add_dependencies(robot_guidance_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+# add_dependencies(robot_guidance_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(robot_guidance_node
-  ${catkin_LIBRARIES}
-)
+#target_link_libraries(robot_guidance_node
+#  ${catkin_LIBRARIES}
+#)
 
 #############
 ## Install ##
