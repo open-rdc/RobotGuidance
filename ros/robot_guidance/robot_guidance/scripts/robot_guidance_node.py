@@ -12,9 +12,11 @@ from std_msgs.msg import Float32, Int8
 
 import sys
 import skimage.transform
+import time
 
 class robot_guidance_node:
     def __init__(self):
+        rospy.init_node('robot_guidance_node', anonymous=True)
         self.rl = reinforcement_learning(3)
         self.bridge = CvBridge()
         self.image_sub = rospy.Subscriber("/image_raw", Image, self.callback)
@@ -22,6 +24,8 @@ class robot_guidance_node:
         self.action_pub = rospy.Publisher("action", Int8, queue_size=10)
         self.action = 0
         self.reward = 0
+        self.t0 = rospy.Time.now().to_sec()
+        self.t1 = 0
 
     def callback(self, data):
         try:
@@ -37,10 +41,15 @@ class robot_guidance_node:
         r, g, b = cv2.split(img)
         imgobj = np.asanyarray([r,g,b])
 #        print(imgobj)
-        self.action = self.rl.act_and_trains(imgobj, self.reward)
-        self.action_pub.publish(self.action)
+        self.t1 = rospy.Time.now().to_sec()
+        if self.t1 >= self.t0 + 1:
+            self.action = self.rl.act_and_trains(imgobj, self.reward)
+            self.action_pub.publish(self.action)
+            print("action: " +str(self.action) + ", reward: " + str(self.reward))
 
-        print("action: " +str(self.action) + ", reward: " + str(self.reward))
+            self.t0 = rospy.Time.now().to_sec()
+            self.rl.save_agent()
+            print('saved agent')
 
     def callback_reward(self, reward):
         self.reward = reward.data
@@ -48,7 +57,6 @@ class robot_guidance_node:
 
 if __name__ == '__main__':
     rg = robot_guidance_node()
-    rospy.init_node('robot_guidance_node', anonymous=True)
     try:
         rospy.spin()
     except KeyboardInterrupt:

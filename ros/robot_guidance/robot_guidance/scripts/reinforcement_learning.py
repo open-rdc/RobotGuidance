@@ -46,7 +46,7 @@ class reinforcement_learning:
         home = expanduser("~")
         if os.path.isdir(home + '/agent'):
             self.agent.load('agent')
-            print('Load agent')
+            print('Loaded agent')
 
     def act_and_trains(self, obs, reward):
         self.action = self.agent.act_and_train(obs, reward)
