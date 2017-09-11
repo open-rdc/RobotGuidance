@@ -1,5 +1,5 @@
 <launch>
-    <include file="$(find robot_guidance)/launch/interaction_robot_sim.launch">
+    <include file="$(find robot_guidance)/launch/interaction_robot.launch">
     </include>
 
     <include file="$(find robot_guidance)/launch/uvc_camera_node0.launch">
