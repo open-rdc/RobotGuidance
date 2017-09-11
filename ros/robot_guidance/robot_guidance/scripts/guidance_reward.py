@@ -13,10 +13,23 @@ class guidance_reward:
 		self.reward_pub = rospy.Publisher('/reward', Float32, queue_size=10)
 		self.action = 0
 		self.poten = Adc()
+		self.pitch = 0
+		self.yaw = 0
 
 	def callback_poten(self, data):
 		self.poten = data
-		self.reward = 2.0 - (self.poten.adc0 + self.poten.adc1 + self.poten.adc2 * 2 + self.poten.adc3 * 2) / 100.0
+#		self.reward = 2.0 - (self.poten.adc0 + self.poten.adc1 + self.poten.adc2 * 2 + self.poten.adc3 * 2) / 100.0
+				
+		self.reward = 0;		
+		yaw = self.poten.adc0 + self.poten.adc1;
+		if ((yaw <= 5) or ((yaw - self.yaw) < 0)):
+			self.reward += 1
+		self.yaw = yaw
+
+		pitch = self.poten.adc2 + self.poten.adc3
+		if ((pitch <= 5) or (pitch - self.pitch) < 0):
+			self.reward += 1
+		self.pitch = pitch
 
 		print 'reward = ', self.reward
 
