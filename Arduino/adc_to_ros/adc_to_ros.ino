@@ -74,5 +74,5 @@ void loop(){
   p.publish(&adc_msg);
 
   nh.spinOnce();
-  delay(500);
+  delay(200);
 }
