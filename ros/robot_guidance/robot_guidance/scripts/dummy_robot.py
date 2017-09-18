@@ -20,21 +20,23 @@ class dummy_robot:
         self.pan = 0
         self.reward = 0
         self.cv_image = np.zeros((480,640,3), np.uint8)
+        self.cv_image.fill(255)
         self.image = self.bridge.cv2_to_imgmsg(self.cv_image, encoding="bgr8")
         self.timer = rospy.Timer(rospy.Duration(0.1), self.callback_timer)
 
     def callback_timer(self, data):
+        self.cv_image.fill(255)
         cv2.circle(self.cv_image, (640 / 2 + self.pan, 480 / 2), 200, (0, 255, 0), -1)
         self.image = self.bridge.cv2_to_imgmsg(self.cv_image, encoding="bgr8")
         self.image_pub.publish(self.image)
 
     def callback_action(self, data):
-        action_list = [-10, 0, 10]
-        if (self.data < 0 or self.data >= 3):
-            return
+        action_list = [0, -10, 10]
         self.action = data.data
+        if (self.action < 0 or self.action >= 3):
+            return
         self.pan += action_list[self.action]
-        self.reward = 1.0 - self.pan / 100.0
+        self.reward = 1.0 - abs(self.pan) / 100.0
 
         print("selected_action: " + str(self.action) + ", reward: " + str(self.reward))
         self.reward_pub.publish(self.reward)
