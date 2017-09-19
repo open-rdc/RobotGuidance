@@ -22,3 +22,9 @@ Bagファイルを取る。
 ```
 rosbag record -a
 ```
+
+Bagファイルのデータを.csvにエクスポートする。
+```
+roscore
+rostopic echo -b FILE.bag -p /TOPIC_NAME > FILE.csv
+```
