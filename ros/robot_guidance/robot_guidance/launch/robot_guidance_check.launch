@@ -1,7 +1,0 @@
-<launch>
-    <node pkg="robot_guidance" type="robot_guidance_node.py" name="robot_guidance_node" output="screen">
-    </node>
-
-    <node pkg="robot_guidance" type="dummy_robot.py" name="dummy_robot" output="screen">
-    </node>
-</launch>
