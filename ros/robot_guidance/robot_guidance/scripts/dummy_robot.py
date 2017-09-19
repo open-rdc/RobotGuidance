@@ -24,6 +24,7 @@ class dummy_robot:
         self.image = self.bridge.cv2_to_imgmsg(self.cv_image, encoding="bgr8")
         self.timer = rospy.Timer(rospy.Duration(0.033), self.callback_timer)
         self.count = 0
+        self.velocity = 0
 
     def callback_timer(self, data):
 #        print('Timer called at ' + str(data.current_real))
@@ -41,7 +42,9 @@ class dummy_robot:
         self.action = data.data
         if (self.action < 0 or self.action >= 3):
             return
-        self.pan += action_list[self.action]
+        #delay
+        self.pan += self.velocity
+        self.velocity += max(min(action_list[self.action] - self.velocity, 10), -10)
         self.reward = 1.0 - abs(self.pan) / 100.0
 
 #        print("selected_action: " + str(self.action) + ", reward: " + str(self.reward))
