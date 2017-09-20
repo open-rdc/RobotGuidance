@@ -28,7 +28,7 @@ class robot_guidance_node:
         self.t1 = 0
         self.count = 0
 
-    def __del__(self):
+    def save(self):
         self.rl.save_agent()
         print('saved agent')
 
@@ -67,4 +67,5 @@ if __name__ == '__main__':
         rospy.spin()
     except KeyboardInterrupt:
         print("Shutting Down")
+    rg.save()
     cv2.destroyAllWindows()
