@@ -65,11 +65,11 @@ class dummy_robot:
         self.arrow_cv_image.fill(255)
         cv2.line(self.arrow_cv_image, pt1, pt2, (0,0,200), 10)
         cv2.imshow("action", self.arrow_cv_image)
-        cv2.circle(self.cv_image, (640 / 2 + self.pan, 480 / 2), 200, (0, 255, 0), -1)
-        cv2.imshow("cv_image", self.cv_image)
+#        cv2.circle(self.cv_image, (640 / 2 + self.pan, 480 / 2), 200, (0, 255, 0), -1)
+#        cv2.imshow("cv_image", self.cv_image)
         cv2.waitKey(1)
 
-if ___ == '__main__':
+if __name__ == '__main__':
     dr = dummy_robot()
     try:
         rospy.spin()
