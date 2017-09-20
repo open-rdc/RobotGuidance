@@ -7,7 +7,7 @@ import os
 from os.path import expanduser
 
 class QFunction(chainer.Chain):
-    def __init__(self, n_history=3, n_action=5):
+    def __init__(self, n_history=3, n_action=3):
         initializer = chainer.initializers.HeNormal()
         super(QFunction, self).__init__(
             conv1=L.Convolution2D(n_history, 32, ksize=8, stride=4, nobias=False, initialW=initializer),
