@@ -21,13 +21,22 @@ class robot_guidance_node:
         self.bridge = CvBridge()
         self.image_sub = rospy.Subscriber("/image_raw", Image, self.callback)
         self.reward_sub = rospy.Subscriber("/reward", Float32, self.callback_reward)
-        self.action_pub = rospy.Publisher("action", Int8, queue_size=10)
+        self.action_pub = rospy.Publisher("action", Int8, queue_size=1)
         self.action = 0
         self.reward = 0
         self.t0 = rospy.Time.now().to_sec()
         self.t1 = 0
+        self.count = 0
+
+    def __del__(self):
+        self.rl.save_agent()
+        print('saved agent')
+
 
     def callback(self, data):
+        self.count += 1
+        if (self.count > 10000):
+            return
         try:
             cv_image = self.bridge.imgmsg_to_cv2(data, "bgr8")
         except CvBridgeError as e:
@@ -42,14 +51,11 @@ class robot_guidance_node:
         imgobj = np.asanyarray([r,g,b])
 #        print(imgobj)
         self.t1 = rospy.Time.now().to_sec()
-        if self.t1 >= self.t0 + 1:
+        if self.t1 >= self.t0 + 0.033:
             self.action = self.rl.act_and_trains(imgobj, self.reward)
             self.action_pub.publish(self.action)
-            print("action: " +str(self.action) + ", reward: " + str(self.reward))
-
+            print("count = " + "{0:05d}".format(self.count) + ", action: " +str(self.action) + ", reward: " + str(self.reward))
             self.t0 = rospy.Time.now().to_sec()
-            self.rl.save_agent()
-            print('saved agent')
 
     def callback_reward(self, reward):
         self.reward = reward.data

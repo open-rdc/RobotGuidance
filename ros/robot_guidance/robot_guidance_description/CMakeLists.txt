@@ -8,7 +8,7 @@ project(robot_guidance_description)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  robot_guidance_description
+  icart_mini_description
   xacro
 )
 
