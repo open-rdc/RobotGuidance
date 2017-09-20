@@ -50,7 +50,7 @@ class dummy_robot:
 #        self.velocity += max(min(action_list[self.action] - self.velocity, 10), -10)
         self.reward = min(1.0 - abs(self.pan) / 100.0, 1.0)
 #        self.reward = np.sign(self.reward) * (self.reward ** 2)
-#        self.reward = self.reward ** 3
+        self.reward = self.reward ** 3
 
 #        print("selected_action: " + str(self.action) + ", reward: " + str(self.reward))
         self.reward_pub.publish(self.reward)
