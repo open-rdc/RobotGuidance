@@ -12,7 +12,6 @@ from std_msgs.msg import Float32, Int8
 
 import sys
 import skimage.transform
-import time
 
 class robot_guidance_node:
     def __init__(self):
@@ -24,36 +23,36 @@ class robot_guidance_node:
         self.action_pub = rospy.Publisher("action", Int8, queue_size=10)
         self.action = 0
         self.reward = 0
-        self.t0 = rospy.Time.now().to_sec()
-        self.t1 = 0
+        self.cv_image = []
+        self.count = 0
+#        self.t0 = rospy.Time.now().to_sec()
+#        self.t1 = self.t0
+#        self.t2 = self.t0
 
     def callback(self, data):
         try:
-            cv_image = self.bridge.imgmsg_to_cv2(data, "bgr8")
+            self.cv_image = self.bridge.imgmsg_to_cv2(data, "bgr8")
         except CvBridgeError as e:
             print(e)
 
-        img = resize(cv_image, (48, 64), mode='constant')
-        cv2.imshow("Capture Image", cv_image)
-        cv2.imshow("Image Object", img)
+
+        cv2.imshow("Capture Image", self.cv_image)
         cv2.waitKey(1)
-
-        r, g, b = cv2.split(img)
-        imgobj = np.asanyarray([r,g,b])
-#        print(imgobj)
-        self.t1 = rospy.Time.now().to_sec()
-        if self.t1 >= self.t0 + 1:
-            self.action = self.rl.act_and_trains(imgobj, self.reward)
-            self.action_pub.publish(self.action)
-            print("action: " +str(self.action) + ", reward: " + str(self.reward))
-
-            self.t0 = rospy.Time.now().to_sec()
-            self.rl.save_agent()
-            print('saved agent')
 
     def callback_reward(self, reward):
         self.reward = reward.data
-        return 0
+        img = resize(self.cv_image, (48, 64), mode='constant')
+        r, g, b = cv2.split(img)
+        imgobj = np.asanyarray([r,g,b])
+
+        self.action = self.rl.act_and_trains(imgobj, self.reward)
+        self.action_pub.publish(self.action)
+        self.count += 1
+        print("count: " + str(self.count) + " action: " + str(self.action) + ", reward: " + str(self.reward))
+
+#        if self.count % 300 == 0:
+#            self.rl.save_agent()
+#            self.count = 0
 
 if __name__ == '__main__':
     rg = robot_guidance_node()
