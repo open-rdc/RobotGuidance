@@ -37,7 +37,7 @@ class robot_guidance_node:
         self.t1 = rospy.Time.now().to_sec()
         if self.t1 >= self.t0 + 0.1:
             self.count += 1
-            if (self.count > 10000):
+            if (self.count > 100000):
                 return
             try:
                 cv_image = self.bridge.imgmsg_to_cv2(data, "bgr8")
@@ -45,6 +45,7 @@ class robot_guidance_node:
                 print(e)
 
             img = resize(cv_image, (48, 64), mode='constant')
+            cv2.circle(cv_image, (640 / 2, 480 / 2), 100, (0, 0, 255), 3)
             cv2.imshow("Capture Image", cv_image)
             cv2.imshow("Image Object", img)
 
@@ -67,5 +68,5 @@ if __name__ == '__main__':
         rospy.spin()
     except KeyboardInterrupt:
         print("Shutting Down")
-    rg.save()
+#    rg.save()
     cv2.destroyAllWindows()
