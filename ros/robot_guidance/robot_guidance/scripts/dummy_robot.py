@@ -18,6 +18,7 @@ class dummy_robot:
         self.action_sub = rospy.Subscriber("action", Int8, self.callback_action)
         self.action = 0
         self.pan = 0
+	self.fb = 100
         self.reward = 0
         self.cv_image = np.zeros((480,640,3), np.uint8)
         self.cv_image.fill(255)
@@ -34,23 +35,22 @@ class dummy_robot:
         self.count += 1
         if ((self.count % 200) == 0):
             self.pan = int(np.random.rand() * 400 - 200)
+            self.fb = int(np.random.rand() * 100) + 100
             print("change pan angle")
-        cv2.circle(self.cv_image, (640 / 2 + self.pan, 480 / 2), 200, (0, 255, 0), -1)
+        cv2.circle(self.cv_image, (640 / 2 + self.pan, 480 / 2), 300 - self.fb, (0, 255, 0), -1)
         self.image = self.bridge.cv2_to_imgmsg(self.cv_image, encoding="bgr8")
         self.image_pub.publish(self.image)
 
     def callback_action(self, data):
-        action_list = [0, -10, 10]
+        action_list = [[0, 0], [-10, -2], [10, -2], [0, -4]]
         self.action = data.data
-        if (self.action < 0 or self.action >= 3):
+        if (self.action < 0 or self.action >= 4):
             return
-        self.pan += action_list[self.action]
-        #delay
-#        self.pan += self.velocity
-#        self.velocity += max(min(action_list[self.action] - self.velocity, 10), -10)
-        self.reward = min(1.0 - abs(self.pan) / 100.0, 1.0)
-#        self.reward = np.sign(self.reward) * (self.reward ** 2)
-        self.reward = self.reward ** 3
+        self.pan += action_list[self.action][0]
+	self.fb += action_list[self.action][1]
+        reward_pan = min(1.0 - abs(self.pan) / 100.0, 1.0) ** 3
+        reward_fb  = min(1.0 - abs(self.fb - 100.0) / 30.0, 1.0) ** 3
+        self.reward = reward_pan + reward_fb;
 
 #        print("selected_action: " + str(self.action) + ", reward: " + str(self.reward))
         self.reward_pub.publish(self.reward)
@@ -60,6 +60,8 @@ class dummy_robot:
             pt2 = (320-200, 50)
         elif (self.action == 2):
             pt2 = (320+200, 50)
+        elif (self.action == 3):
+            pt2 = (320, 50+50)
         else:
             pt2 = (320, 50)
         self.arrow_cv_image.fill(255)
