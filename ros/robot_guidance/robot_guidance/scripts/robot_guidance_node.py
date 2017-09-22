@@ -16,14 +16,15 @@ import skimage.transform
 class robot_guidance_node:
     def __init__(self):
         rospy.init_node('robot_guidance_node', anonymous=True)
-        self.rl = reinforcement_learning(3)
+        self.action_num = rospy.get_param("action_num", 3)
+        self.rl = reinforcement_learning(n_action = self.action_num)
         self.bridge = CvBridge()
         self.image_sub = rospy.Subscriber("/image_raw", Image, self.callback)
         self.reward_sub = rospy.Subscriber("/reward", Float32, self.callback_reward)
-        self.action_pub = rospy.Publisher("action", Int8, queue_size=10)
+        self.action_pub = rospy.Publisher("action", Int8, queue_size=1)
         self.action = 0
         self.reward = 0
-        self.cv_image = []
+        self.cv_image = np.zeros((480,640,3), np.uint8)
         self.count = 0
 
     def callback(self, data):
@@ -42,9 +43,9 @@ class robot_guidance_node:
         imgobj = np.asanyarray([r,g,b])
         
         self.action = self.rl.act_and_trains(imgobj, self.reward)
-        self.action_pub.publish(self.action)
         self.count += 1
         print("count: " + str(self.count) + " action: " + str(self.action) + ", reward: " + str(self.reward))
+        self.action_pub.publish(self.action)
 
 if __name__ == '__main__':
     rg = robot_guidance_node()
