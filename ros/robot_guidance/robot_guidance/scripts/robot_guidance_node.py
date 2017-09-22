@@ -25,17 +25,13 @@ class robot_guidance_node:
         self.reward = 0
         self.cv_image = []
         self.count = 0
-#        self.t0 = rospy.Time.now().to_sec()
-#        self.t1 = self.t0
-#        self.t2 = self.t0
 
     def callback(self, data):
         try:
             self.cv_image = self.bridge.imgmsg_to_cv2(data, "bgr8")
         except CvBridgeError as e:
             print(e)
-
-
+        
         cv2.imshow("Capture Image", self.cv_image)
         cv2.waitKey(1)
 
@@ -44,15 +40,11 @@ class robot_guidance_node:
         img = resize(self.cv_image, (48, 64), mode='constant')
         r, g, b = cv2.split(img)
         imgobj = np.asanyarray([r,g,b])
-
+        
         self.action = self.rl.act_and_trains(imgobj, self.reward)
         self.action_pub.publish(self.action)
         self.count += 1
         print("count: " + str(self.count) + " action: " + str(self.action) + ", reward: " + str(self.reward))
-
-#        if self.count % 300 == 0:
-#            self.rl.save_agent()
-#            self.count = 0
 
 if __name__ == '__main__':
     rg = robot_guidance_node()

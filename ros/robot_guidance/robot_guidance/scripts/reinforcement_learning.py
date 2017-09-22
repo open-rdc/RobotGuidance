@@ -61,7 +61,6 @@ class QFunctionX(chainer.Chain):
 #==========================================AlexNet==========================================
 
 class reinforcement_learning:
-#    def __init__(self, n_history=3, n_action=5):
     def __init__(self, n_history=3, n_action=5):
         self.q_func = QFunction(n_history, n_action)
         self.q_func.to_gpu()
