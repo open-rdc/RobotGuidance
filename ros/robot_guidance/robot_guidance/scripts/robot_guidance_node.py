@@ -16,7 +16,8 @@ import skimage.transform
 class robot_guidance_node:
     def __init__(self):
         rospy.init_node('robot_guidance_node', anonymous=True)
-        self.action_num = rospy.get_param("action_num", 3)
+        self.action_num = rospy.get_param("/robot_guidance_node/action_num", 3)
+        print("action_num: " + str(self.action_num))
         self.rl = reinforcement_learning(n_action = self.action_num)
         self.bridge = CvBridge()
         self.image_sub = rospy.Subscriber("/image_raw", Image, self.callback)

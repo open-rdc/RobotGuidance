@@ -17,8 +17,7 @@ class dummy_robot:
         self.reward_pub = rospy.Publisher("reward", Float32, queue_size=1)
         self.action_sub = rospy.Subscriber("action", Int8, self.callback_action)
         self.action = 0
-        self.pan = 0
-        self.fb = 100
+        self.size = 0
         self.reward = 0
         self.cv_image = np.zeros((480,640,3), np.uint8)
         self.cv_image.fill(255)
@@ -32,30 +31,30 @@ class dummy_robot:
 
     def callback_image_timer(self, data):
         self.cv_image.fill(255)
-        cv2.circle(self.cv_image, (640 / 2 + self.pan, 480 / 2), 300 - self.fb, (0, 255, 0), -1)
+        cv2.circle(self.cv_image, (640 / 2, 480 / 2), 100 + self.size, (0, 255, 0), -1)
         self.image = self.bridge.cv2_to_imgmsg(self.cv_image, encoding="bgr8")
         self.image_pub.publish(self.image)
 
     def callback_action(self, data):
-        action_list = [[0, 0], [-10, -2], [10, -2], [0, -4]]
+        action_list = [0, -2, 2]
         self.action = data.data
-        if (self.action < 0 or self.action >= 4):
+        if (self.action < 0 or self.action >= 3):
             return
-        self.pan += action_list[self.action][0]
-        self.fb += action_list[self.action][1]
+        self.size += action_list[self.action]
+        if self.size < -50:
+            self.size = -50
+        elif self.size > 50:
+            self.size = 50
         self.count += 1
         if ((self.count % 200) == 0):
-            self.pan = int(np.random.rand() * 400 - 200)
-            self.fb = int(np.random.rand() * 100) + 100
-            print("change pan angle")
+            self.size = int(np.random.rand() * 100 - 50)
+            print("change circle size")
 
         pt1 = (320, 50)
         if (self.action == 1):
             pt2 = (320-200, 50)
         elif (self.action == 2):
             pt2 = (320+200, 50)
-        elif (self.action == 3):
-            pt2 = (320, 50+50)
         else:
             pt2 = (320, 50)
         self.arrow_cv_image.fill(255)
@@ -67,9 +66,8 @@ class dummy_robot:
         if (self.prev_count == self.count):
             print("reward timer is too first!")
         self.prev_count = self.count
-        reward_pan = min(1.0 - abs(self.pan) / 100.0, 1.0) ** 3
-        reward_fb = min(1.0 - abs(self.fb - 100.0) / 30.0, 1.0) ** 3
-        self.reward = reward_pan + reward_fb;
+        self.reward = min(1.0 - abs(self.size) / 25.0, 1.0)
+        self.reward = self.reward ** 3
 #        print("selected_action: " + str(self.action) + ", reward: " + str(self.reward))
         self.reward_pub.publish(self.reward)
 

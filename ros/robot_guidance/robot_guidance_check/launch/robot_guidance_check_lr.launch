@@ -1,0 +1,8 @@
+<launch>
+    <node pkg="robot_guidance" type="robot_guidance_node.py" name="robot_guidance_node" output="screen">
+        <param name ="action_num" value="3"></param>
+    </node>
+
+    <node pkg="robot_guidance_check" type="dummy_robot_lr.py" name="dummy_robot_lr" output="screen">
+    </node>
+</launch>
