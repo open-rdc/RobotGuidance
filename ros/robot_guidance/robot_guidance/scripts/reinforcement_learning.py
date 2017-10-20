@@ -8,7 +8,7 @@ from os.path import expanduser
 
 #===========================================PONG===========================================
 class QFunction(chainer.Chain):
-    def __init__(self, n_history=3, n_action=5):
+    def __init__(self, n_history=3, n_action=3):
         initializer = chainer.initializers.HeNormal()
         super(QFunction, self).__init__(
             conv1=L.Convolution2D(n_history, 32, ksize=8, stride=4, nobias=False, initialW=initializer),
@@ -61,7 +61,8 @@ class QFunctionX(chainer.Chain):
 #==========================================AlexNet==========================================
 
 class reinforcement_learning:
-    def __init__(self, n_history=3, n_action=5):
+#    def __init__(self, n_history=3, n_action=5):
+    def __init__(self, n_history=3, n_action=3):
         self.q_func = QFunction(n_history, n_action)
         self.q_func.to_gpu()
         self.optimizer = chainer.optimizers.Adam(eps=1e-2)
@@ -84,6 +85,10 @@ class reinforcement_learning:
 
     def act_and_trains(self, obs, reward):
         self.action = self.agent.act_and_train(obs, reward)
+        return self.action
+
+    def act(self, obs):
+        self.action = self.agent.act(obs)
         return self.action
 
     def save_agent(self):
