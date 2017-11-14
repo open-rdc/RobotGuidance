@@ -52,7 +52,7 @@ void loop(){
   analog2 = analogRead(analogPin2);
 
   degree1 = int((analog1 - analog1_zero) * analog2degree1) - 100;
-  degree2 = int((analog2 - analog2_zero) * analog2degree2) - 45;
+  degree2 = int((analog2 - analog2_zero) * analog2degree2) - 62;
 
   if(degree1 < 0){
     adc_msg.adc0 = abs(degree1);

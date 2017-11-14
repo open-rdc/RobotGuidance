@@ -64,7 +64,10 @@ class reinforcement_learning:
 #    def __init__(self, n_history=3, n_action=5):
     def __init__(self, n_history=3, n_action=3):
         self.q_func = QFunction(n_history, n_action)
-        self.q_func.to_gpu()
+        try:
+            self.q_func.to_gpu()
+        except:
+            print("No GPU")
         self.optimizer = chainer.optimizers.Adam(eps=1e-2)
         self.optimizer.setup(self.q_func)
         self.gamma = 0.95
