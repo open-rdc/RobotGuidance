@@ -51,7 +51,7 @@ void loop(){
   analog1 = analogRead(analogPin1);
   analog2 = analogRead(analogPin2);
 
-  degree1 = int((analog1 - analog1_zero) * analog2degree1) - 100;
+  degree1 = int((analog1 - analog1_zero) * analog2degree1) - 34;
   degree2 = int((analog2 - analog2_zero) * analog2degree2) - 62;
 
   if(degree1 < 0){

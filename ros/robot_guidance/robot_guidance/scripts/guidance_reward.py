@@ -11,8 +11,8 @@ class guidance_reward:
 		rospy.init_node('guidance_reward', anonymous=True)
 		self.poten_sub = rospy.Subscriber("/adc", Adc, self.callback_poten)
 		self.reward_pub = rospy.Publisher('/reward', Float32, queue_size=10)
-		self.action = 0
 		self.poten = Adc()
+		self.action = 0
 		self.pitch = 0
 		self.yaw = 0
 
@@ -20,21 +20,19 @@ class guidance_reward:
 		self.poten = data
 		self.reward_fb = 0
 		self.reward_lr = 0
-		self.reward = 0;		
-
+		self.reward = 0
 
 		if self.poten.adc2 > 120:
+			#	for testing
 			self.reward = -10000
 		else:
 #			self.reward_fb = 1.0 - self.poten.adc2/60.0 - self.poten.adc3/2.0
 			self.reward_lr = 1.0 - (self.poten.adc0 + self.poten.adc1)/30.0
-#			self.reward = self.reward_fb ** 3 + self.reward_lr ** 3
 			self.reward = self.reward_fb + self.reward_lr ** 3
 
+		print 'LR = ', round(self.reward_lr, 2), ' \tBF = ', round(self.reward_fb, 2), '\treward = ', round(self.reward, 2)
 
-		print 'LR = ', round(self.reward_lr, 3), ' \tBF = ', round(self.reward_fb, 3), '\treward = ', round(self.reward, 3)
-
-		#Publish the velocity
+		#Publish the reward
 		self.reward_pub.publish(self.reward)
 
 if __name__ == '__main__':

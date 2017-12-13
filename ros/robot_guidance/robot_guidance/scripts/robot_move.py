@@ -6,7 +6,6 @@ import rospy
 from geometry_msgs.msg import Twist
 from std_msgs.msg import Float32, Int8
 
-
 linear_vel = 0.1
 angle_vel = 0.2
 
@@ -20,14 +19,16 @@ class robot_move:
 
 	def callback_action(self, data):
 		self.action = data.data
-		self.action += 1
+
 		# [velocity (m/s), angular velocity(rad/s)]
-		velocity = [[0.0, 0,0], [linear_vel, 0.0], [linear_vel, -angle_vel], [linear_vel, angle_vel], [-linear_vel, 0.0]]
+		velocity = [[linear_vel, 0.0], [linear_vel, -angle_vel], [linear_vel, angle_vel], [-linear_vel, 0.0], [0.0, 0,0]]
 		self.vel_msg.linear.x = velocity[self.action][0]
 		self.vel_msg.angular.z = velocity[self.action][1]
 		print 'velocity = ', self.vel_msg
 
-		move = ['Stop', 'Front', 'Right', 'Left', 'Back']
+#		move = ['Stop', 'Right', 'Front', 'Left', 'Stop']
+#		move = ['Stop', 'Front', 'Back']
+		move = ['Front', 'Right', 'Left', 'Back', 'Stop']
 		print 'action = ', move[self.action]
 
 		#Publish the velocity
