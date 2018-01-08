@@ -49,5 +49,5 @@ export ROS_MASTER_URI=http://[中村くんのPCのIP]:11311 # 例 export ROS_MAS
 export ROS_IP=[学習PCのIP] # 例 export ROS_IP=192.168.0.53
 
 
-rosrun robot_guidance robot_guidance_node.py
+rosrun robot_guidance ml.py
 ```
