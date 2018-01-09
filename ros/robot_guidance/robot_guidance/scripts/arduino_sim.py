@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 import rospy
 from rosserial_arduino.msg import Adc
+import time
 
 
 def arduino_sim():
 	adc_pub = rospy.Publisher("/adc", Adc, queue_size=1)
 	rospy.init_node('arduino_sim', anonymous=True)
-	rate = rospy.Rate(200) # 200hz
 	adc = Adc()
 	adc.adc0 = 0
 	adc.adc1 = 0
@@ -19,7 +19,7 @@ def arduino_sim():
 
 		adc.adc0 = 100
 		adc_pub.publish(adc)
-		rate.sleep()
+		time.sleep(0.2)
 
 if __name__ == '__main__':
 	try:
