@@ -39,7 +39,7 @@ class dummy_robot:
         self.image_pub.publish(self.image)
 
     def callback_action(self, data):
-        action_list = [[0, 0], [-10, 0], [10, 0], [0, -2], [0, 2]]
+        action_list = [[0, 2], [-10, 0], [10, 0], [0, 0]]
         self.action = data.data
         if (self.action < 0 or self.action >= 5):
             return
@@ -50,7 +50,7 @@ class dummy_robot:
         elif self.size > 50:
             self.size = 50
         self.count += 1
-        if ((self.count % 400) == 0):
+        if ((self.count % 100) == 0):
             self.pan = int(np.random.rand() * 400 - 200)
             self.size = int(np.random.rand() * 100 - 50)
             print("change pan angle && circle size")
@@ -61,11 +61,10 @@ class dummy_robot:
         elif (self.action == 2):
             pt2 = (320+200, 100)
         elif (self.action == 3):
-            pt2 = (320, 100 + 50)
-        elif (self.action == 4):
-            pt2 = (320, 100 - 50)
-        else:
             pt2 = (320, 100)
+        else:
+            pt2 = (320, 100 - 50)
+
         self.arrow_cv_image.fill(255)
         cv2.line(self.arrow_cv_image, pt1, pt2, (0,0,200), 10)
         cv2.imshow("action", self.arrow_cv_image)
@@ -77,8 +76,8 @@ class dummy_robot:
         self.prev_count = self.count
         self.reward_lr = min(1.0 - abs(self.pan) / 100.0, 1.0)
         self.reward_fb = min(1.0 - abs(self.size) / 25.0, 1.0)
-        self.reward_lr = self.reward_lr ** 3
-        self.reward_fb = self.reward_fb ** 3
+        self.reward_lr = self.reward_lr ** 3 - 1
+        self.reward_fb = self.reward_fb ** 3 - 1
         self.reward = self.reward_lr + self.reward_fb
 #        print("selected_action: " + str(self.action) + ", reward: " + str(self.reward))
         self.reward_pub.publish(self.reward)
