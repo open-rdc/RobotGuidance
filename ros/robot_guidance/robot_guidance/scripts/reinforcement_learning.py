@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import chainerrl
 import chainer
 import chainer.functions as F
@@ -6,8 +8,10 @@ import numpy as np
 import os
 from os.path import expanduser
 
+n_action = 4
+
 class QFunction(chainer.Chain):
-	def __init__(self, n_history=3, n_action=4):
+	def __init__(self, n_history=3, n_action=n_action):
 		initializer = chainer.initializers.HeNormal()
 		super(QFunction, self).__init__(
 			conv1=L.Convolution2D(n_history, 32, ksize=8, stride=4, nobias=False, initialW=initializer),
@@ -28,23 +32,28 @@ class QFunction(chainer.Chain):
 		return h
 
 class reinforcement_learning:
-	def __init__(self, n_history=3, n_action=4):
+	def __init__(self, n_history=3, n_action=n_action):
 		self.q_func = QFunction(n_history, n_action)
+
 		try:
 			self.q_func.to_gpu()
 		except:
 			print("No GPU")
+
 		self.optimizer = chainer.optimizers.Adam(eps=1e-2)
 		self.optimizer.setup(self.q_func)
 		self.gamma = 0.95
 		self.n_action = n_action
+
 		self.explorer = chainerrl.explorers.ConstantEpsilonGreedy(
 			epsilon=0.1, random_action_func=self.action_space_sample)
+#		self.explorer = chainerrl.explorers.LinearDecayEpsilonGreedy(
+#			start_epsilon=1.0, end_epsilon=0.1, decay_steps=5000, random_action_func=self.action_space_sample)
 		self.replay_buffer = chainerrl.replay_buffer.ReplayBuffer(capacity=10 ** 4)
 		self.phi = lambda x: x.astype(np.float32, copy=False)
 		self.agent = chainerrl.agents.DoubleDQN(
 			self.q_func, self.optimizer, self.replay_buffer, self.gamma, self.explorer,
-			minibatch_size=4, replay_start_size=500, update_interval=1,
+			minibatch_size=4, replay_start_size=100, update_interval=1,
 			target_update_interval=100, phi=self.phi)
 
 		home = expanduser("~")
@@ -53,8 +62,10 @@ class reinforcement_learning:
 			print('agent LOADED!!')
 
 	def act_and_trains(self, obs, reward):
+#		print(self.explorer)	#check epsilon at that time
 		self.action = self.agent.act_and_train(obs, reward)
 		return self.action
+
 	def act(self, obs):
 		self.action = self.agent.act(obs)
 		return self.action
@@ -64,7 +75,7 @@ class reinforcement_learning:
 		print("agent SAVED!!")
 
 	def action_space_sample(self):
-		return np.random.randint(1,self.n_action)
+		return np.random.randint(0, self.n_action)
 
 if __name__ == '__main__':
 	rl = reinforcement_learning()
