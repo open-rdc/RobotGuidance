@@ -35,6 +35,7 @@ pip install chainerrl scikit-image gym[atari]
 ```
 
 ### 深層学習の動作確認
+
 ```
 cd ~/RobotGuidance/chainer_sample
 python sample_cart_pole.py
@@ -43,18 +44,18 @@ python sample_pong.py
 ```
 
 画像に対する行動選択をコンピュータ内で実行
+
 ```
 roslaunch robot_guidance_check robot_guidance_check.launch
 
 launchファイルの説明
-robot_guidance_check_all.launch
-robot_guidance_check_fb.launch
-robot_guidance_check.launch
-robot_guidance_check_lr.launch
-
+robot_guidance_check_all.launch　左右前後移動の学習
+robot_guidance_check_fb.launch　左右移動の学習
+robot_guidance_check_lr.launch　前後移動の学習
 ```
 
 ### Bagファイルへの保存とCSVへのエクスポート
+
 ```
 rosbag record -a
 roscore
