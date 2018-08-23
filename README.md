@@ -16,7 +16,7 @@ https://youtu.be/YmjjVK531ms
 http://wiki.ros.org/ja/kinetic/Installation/Ubuntu  
 
 ２）orne-navigationのインストール  
-以下のインストール用を実行   
+以下のインストール用をスクリプトを実行   
 https://github.com/open-rdc/orne_navigation/wiki/ORNE%E7%92%B0%E5%A2%83%E3%81%AE%E6%A7%8B%E7%AF%89%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6
 
 ### RobotGuidanceのダウンロード・ビルド
