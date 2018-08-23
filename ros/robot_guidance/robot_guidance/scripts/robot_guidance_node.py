@@ -59,7 +59,7 @@ class robot_guidance_node:
 		ros_time = str(rospy.Time.now())
 		if self.learning:
 			self.action = self.rl.act_and_trains(imgobj, self.reward)
-			line = [ros_time, str(self.reward)]
+			line = [ros_time, str(self.reward), str(self.action)]
 			if self.count == 0:
 				with open(self.path + self.start_time + '/' +  'reward.csv', 'w') as f:
 					writer = csv.writer(f, lineterminator='\n')
@@ -73,12 +73,12 @@ class robot_guidance_node:
 			self.action = self.rl.act(imgobj)
 		self.action_pub.publish(self.action)
 
-		cv2.putText(self.cv_image,self.action_list[self.action],(550,450), cv2.FONT_HERSHEY_SIMPLEX, 1,(0,0,255),2)
-		image_name = self.path + self.start_time + '/' + ros_time + '.png'
-		cv2.imwrite(image_name, img)
+#		cv2.putText(self.cv_image,self.action_list[self.action],(550,450), cv2.FONT_HERSHEY_SIMPLEX, 1,(0,0,255),2)
+#		image_name = self.path + self.start_time + '/' + ros_time + '.png'
+#		cv2.imwrite(image_name, img)
 		print("learning = " + str(self.learning) + " count: " + str(self.count) + " action: " + str(self.action) + ", reward: " + str(round(self.reward,5)))
-		if(self.count % 100 == 0 and self.count > 500):
-			self.rl.save_agent()
+#		if((self.count - 1) % 100 == 0 and self.count > 100):
+#			self.rl.save_agent()
 
 if __name__ == '__main__':
 	rg = robot_guidance_node()

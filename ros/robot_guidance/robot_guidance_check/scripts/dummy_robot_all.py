@@ -28,7 +28,7 @@ class dummy_robot:
         self.arrow_cv_image = np.zeros((200,640,3), np.uint8)
         self.arrow_cv_image.fill(255)
         self.image_timer = rospy.Timer(rospy.Duration(0.033), self.callback_image_timer)
-        self.reward_timer = rospy.Timer(rospy.Duration(0.2), self.callback_reward_timer)
+        self.reward_timer = rospy.Timer(rospy.Duration(0.05), self.callback_reward_timer)
         self.count = 0
         self.prev_count = -1
 
@@ -49,6 +49,10 @@ class dummy_robot:
             self.size = -50
         elif self.size > 50:
             self.size = 50
+        if self.pan < -200:
+            self.pan = -200
+        elif self.pan > 200:
+            self.pan = 200
         self.count += 1
         if ((self.count % 100) == 0):
             self.pan = int(np.random.rand() * 400 - 200)
@@ -76,8 +80,8 @@ class dummy_robot:
         self.prev_count = self.count
         self.reward_lr = min(1.0 - abs(self.pan) / 100.0, 1.0)
         self.reward_fb = min(1.0 - abs(self.size) / 25.0, 1.0)
-        self.reward_lr = self.reward_lr ** 3 - 1
-        self.reward_fb = self.reward_fb ** 3 - 1
+        self.reward_lr = self.reward_lr ** 3 - 0
+        self.reward_fb = self.reward_fb ** 3 - 0
         self.reward = self.reward_lr + self.reward_fb
 #        print("selected_action: " + str(self.action) + ", reward: " + str(self.reward))
         self.reward_pub.publish(self.reward)
