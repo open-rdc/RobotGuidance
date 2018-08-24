@@ -49,14 +49,15 @@ class dummy_robot:
             self.size = -50
         elif self.size > 50:
             self.size = 50
-        if self.pan < -200:
-            self.pan = -200
-        elif self.pan > 200:
-            self.pan = 200
+        if self.pan < -250:
+            self.pan = -250
+        elif self.pan > 250:
+            self.pan = 250
         self.count += 1
         if ((self.count % 100) == 0):
             self.pan = int(np.random.rand() * 400 - 200)
-            self.size = int(np.random.rand() * 100 - 50)
+#            self.size = int(np.random.rand() * 100 - 50)
+            self.size = int(np.random.rand() * 50 - 50)
             print("change pan angle && circle size")
 
         pt1 = (320, 100)
@@ -80,8 +81,8 @@ class dummy_robot:
         self.prev_count = self.count
         self.reward_lr = min(1.0 - abs(self.pan) / 100.0, 1.0)
         self.reward_fb = min(1.0 - abs(self.size) / 25.0, 1.0)
-        self.reward_lr = self.reward_lr ** 3 - 0
-        self.reward_fb = self.reward_fb ** 3 - 0
+        self.reward_lr = self.reward_lr ** 3 - 1
+        self.reward_fb = self.reward_fb ** 3 - 1
         self.reward = self.reward_lr + self.reward_fb
 #        print("selected_action: " + str(self.action) + ", reward: " + str(self.reward))
         self.reward_pub.publish(self.reward)

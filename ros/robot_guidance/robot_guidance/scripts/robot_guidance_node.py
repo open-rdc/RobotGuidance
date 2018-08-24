@@ -36,13 +36,21 @@ class robot_guidance_node:
 		self.path = 'cit-1808/research_pic/'
 		os.makedirs(self.path + self.start_time)
 
+		with open(self.path + self.start_time + '/' +  'reward.csv', 'w') as f:
+			writer = csv.writer(f, lineterminator='\n')
+			writer.writerow(['rostime', 'reward', 'action'])
+		self.done = False
+
 	def callback(self, data):
 		try:
 			self.cv_image = self.bridge.imgmsg_to_cv2(data, "bgr8")
 		except CvBridgeError as e:
 			print(e)
 
-		cv2.imshow("Capture Image", self.cv_image)
+#		cv2.imshow("Capture Image", self.cv_image)
+		temp = self.cv_image
+		cv2.circle(temp, (640 / 2, 480 / 2),  100, (0, 0, 255), 2)
+		cv2.imshow("Capture Image", temp)
 		cv2.waitKey(1)
 
 	def callback_reward(self, reward):
@@ -56,19 +64,25 @@ class robot_guidance_node:
 		else:
 			self.learning = True
 
+
+
 		ros_time = str(rospy.Time.now())
 		if self.learning:
-			self.action = self.rl.act_and_trains(imgobj, self.reward)
-			line = [ros_time, str(self.reward), str(self.action)]
-			if self.count == 0:
-				with open(self.path + self.start_time + '/' +  'reward.csv', 'w') as f:
-					writer = csv.writer(f, lineterminator='\n')
-					writer.writerow(line)
-			else:
-				with open(self.path + self.start_time + '/' +  'reward.csv', 'a') as f:
-					writer = csv.writer(f, lineterminator='\n')
-					writer.writerow(line)
 			self.count += 1
+			if self.count % 100 == 0:
+				self.done = True
+			if self.done:
+				self.action = self.rl.stop_episode_and_train(imgobj, self.reward, self.done)
+				self.done = False
+				print('Last step in this episode')
+			else:
+				self.action = self.rl.act_and_trains(imgobj, self.reward)
+
+			line = [ros_time, str(self.reward), str(self.action)]
+			with open(self.path + self.start_time + '/' +  'reward.csv', 'a') as f:
+				writer = csv.writer(f, lineterminator='\n')
+				writer.writerow(line)
+
 		else:
 			self.action = self.rl.act(imgobj)
 		self.action_pub.publish(self.action)
