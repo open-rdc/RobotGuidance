@@ -65,7 +65,7 @@ class dummy_robot:
 
     def callback_reward_timer(self, data):
         if (self.prev_count == self.count):
-            print("reward timer is too first!")
+            print("reward timer is too fast!")
         self.prev_count = self.count
         reward_pan = min(1.0 - abs(self.pan) / 100.0, 1.0) ** 3
         reward_fb = min(1.0 - abs(self.fb - 100.0) / 30.0, 1.0) ** 3
