@@ -14,6 +14,7 @@ import skimage.transform
 import csv
 import os
 import time
+import copy
 
 class robot_guidance_node:
 	def __init__(self):
@@ -48,7 +49,7 @@ class robot_guidance_node:
 			print(e)
 
 #		cv2.imshow("Capture Image", self.cv_image)
-		temp = self.cv_image
+		temp = copy.deepcopy(self.cv_image)
 		cv2.circle(temp, (640 / 2, 480 / 2),  100, (0, 0, 255), 2)
 		cv2.imshow("Capture Image", temp)
 		cv2.waitKey(1)
@@ -89,7 +90,7 @@ class robot_guidance_node:
 
 #		cv2.putText(self.cv_image,self.action_list[self.action],(550,450), cv2.FONT_HERSHEY_SIMPLEX, 1,(0,0,255),2)
 #		image_name = self.path + self.start_time + '/' + ros_time + '.png'
-#		cv2.imwrite(image_name, img)
+#		cv2.imwrite(image_name, self.cv_image)
 		print("learning = " + str(self.learning) + " count: " + str(self.count) + " action: " + str(self.action) + ", reward: " + str(round(self.reward,5)))
 #		if((self.count - 1) % 100 == 0 and self.count > 100):
 #			self.rl.save_agent()
