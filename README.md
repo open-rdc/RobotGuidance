@@ -11,6 +11,9 @@ Theerapap Pasin、林原 靖男，”強化学習を用いた移動ロボット�
 動画  
 https://youtu.be/YmjjVK531ms
 
+コンピュータ内での挙動の確認
+https://youtu.be/TDZAsw2hM-c
+
 ### インストール
 １）ROS Kineticのインストール  
 http://wiki.ros.org/ja/kinetic/Installation/Ubuntu  
@@ -43,7 +46,7 @@ or
 python sample_pong.py
 ```
 
-画像に対する行動選択をコンピュータ内で実行
+画像に対する行動選択をコンピュータ内で実行して挙動を確認
 
 ```
 roslaunch robot_guidance_check robot_guidance_check.launch
