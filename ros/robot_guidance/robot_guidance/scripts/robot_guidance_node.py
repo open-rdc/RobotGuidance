@@ -41,6 +41,8 @@ class robot_guidance_node:
 			writer = csv.writer(f, lineterminator='\n')
 			writer.writerow(['rostime', 'reward', 'action'])
 		self.done = False
+		self.action_check = ''
+		self.action_diff_count = 0
 
 	def callback(self, data):
 		try:
@@ -60,24 +62,32 @@ class robot_guidance_node:
 		r, g, b = cv2.split(img)
 		imgobj = np.asanyarray([r,g,b])
 
+		if self.learning == True and self.reward == -10000:
+			print('action diff count =', self.action_diff_count)
+			self.action_diff_count = 0
+
 		if self.reward == -10000: #	for testing
 			self.learning = False
 		else:
 			self.learning = True
 
 
-
+		self.action_check = ''
 		ros_time = str(rospy.Time.now())
 		if self.learning:
 			self.count += 1
 			if self.count % 100 == 0:
 				self.done = True
 			if self.done:
-				self.action = self.rl.stop_episode_and_train(imgobj, self.reward, self.done)
+				self.rl.stop_episode_and_train(imgobj, self.reward, self.done)
 				self.done = False
-				print('Last step in this episode')
 			else:
 				self.action = self.rl.act_and_trains(imgobj, self.reward)
+				action_test = self.rl.act(imgobj)
+				if self.action != action_test:
+					self.action_check = 'action diff'
+					self.action_diff_count += 1
+
 
 			line = [ros_time, str(self.reward), str(self.action)]
 			with open(self.path + self.start_time + '/' +  'reward.csv', 'a') as f:
@@ -91,7 +101,7 @@ class robot_guidance_node:
 #		cv2.putText(self.cv_image,self.action_list[self.action],(550,450), cv2.FONT_HERSHEY_SIMPLEX, 1,(0,0,255),2)
 #		image_name = self.path + self.start_time + '/' + ros_time + '.png'
 #		cv2.imwrite(image_name, self.cv_image)
-		print("learning = " + str(self.learning) + " count: " + str(self.count) + " action: " + str(self.action) + ", reward: " + str(round(self.reward,5)))
+		print("learning = " + str(self.learning) + " count: " + str(self.count) + " action: " + str(self.action) + ", reward: " + str(round(self.reward,5)), self.action_check)
 #		if((self.count - 1) % 100 == 0 and self.count > 100):
 #			self.rl.save_agent()
 
