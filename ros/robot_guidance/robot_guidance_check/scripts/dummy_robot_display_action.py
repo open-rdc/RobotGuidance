@@ -30,8 +30,8 @@ class dummy_robot:
         self.image = self.bridge.cv2_to_imgmsg(self.cv_image, encoding="bgr8")
         self.arrow_cv_image = np.zeros((200,640,3), np.uint8)
         self.arrow_cv_image.fill(255)
-        self.image_timer = rospy.Timer(rospy.Duration(0.1), self.callback_image_timer)
-        self.reward_timer = rospy.Timer(rospy.Duration(0.1), self.callback_reward_timer)
+        self.image_timer = rospy.Timer(rospy.Duration(0.05), self.callback_image_timer)
+        self.reward_timer = rospy.Timer(rospy.Duration(0.05), self.callback_reward_timer)
         self.count = 0
         self.prev_count = -1
         self.display_action_mode = False
