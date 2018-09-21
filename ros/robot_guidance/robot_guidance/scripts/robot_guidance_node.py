@@ -76,7 +76,7 @@ class robot_guidance_node:
 		ros_time = str(rospy.Time.now())
 		if self.learning:
 			self.count += 1
-			if self.count % 100 == 0:
+			if self.count % 2 == 0:
 				self.done = True
 			if self.done:
 				self.rl.stop_episode_and_train(imgobj, self.reward, self.done)
