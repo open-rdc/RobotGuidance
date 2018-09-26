@@ -74,19 +74,23 @@ class dummy_robot:
         self.size = min(max(self.size, -size_limit), size_limit)
         self.pan = min(max(self.pan, -pan_limit), pan_limit)
         self.count += 1
-        if ((self.count % 2) == 0):
+        if ((self.count % 100) == 0 and self.count >= 100000 or self.count == 100):
             self.display_action_mode = True
             self.display_actions_process(True)
 #            self.pan = int(np.random.rand() * 400 - 200)
 #            self.size = int(np.random.rand() * 50 - 50)
 #            print("change pan angle && circle size")
+        if (self.count % 100) == 0:
+            self.pan = int(np.random.rand() * 400 - 200)
+            self.size = int(np.random.rand() * 50 - 50)
+            print("change pan angle && circle size")
 
 #display action
         center = (320, 100)
         arrow = [(center[0], center[1]-50), (center[0]-200, center[1]), (center[0]+200, center[1]), center]
         self.arrow_cv_image.fill(255)
         cv2.line(self.arrow_cv_image, center, arrow[self.action], (0,0,200), 10)
-        cv2.imshow("action", self.arrow_cv_image)
+#        cv2.imshow("action", self.arrow_cv_image)
         cv2.waitKey(1)
 
     def callback_reward_timer(self, data):
@@ -98,8 +102,8 @@ class dummy_robot:
         self.prev_count = self.count
         self.reward_lr = min(1.0 - abs(self.pan) / 100.0, 1.0)
         self.reward_fb = min(1.0 - abs(self.size) / 25.0, 1.0)
-        self.reward_lr = self.reward_lr ** 3 - 0.5
-        self.reward_fb = self.reward_fb ** 3 - 0.5
+        self.reward_lr = self.reward_lr ** 3 - 0
+        self.reward_fb = self.reward_fb ** 3 - 0
         self.reward = self.reward_lr + self.reward_fb
 #        print("selected_action: " + str(self.action) + ", reward: " + str(self.reward))
         self.reward_pub.publish(self.reward)

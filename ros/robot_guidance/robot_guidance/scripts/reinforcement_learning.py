@@ -57,7 +57,7 @@ class reinforcement_learning:
 		return self.action
 	def stop_episode_and_train(self, obs, reward, done):
 		self.agent.stop_episode_and_train(obs, reward, done)
-		#print('Last step in this episode')
+		print('\x1b[6;30;42m' + 'Last step in this episode' + '\x1b[0m')
 	def act(self, obs):
 		self.action = self.agent.act(obs)
 		return self.action

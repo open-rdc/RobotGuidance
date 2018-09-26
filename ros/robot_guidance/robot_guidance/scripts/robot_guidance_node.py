@@ -43,6 +43,7 @@ class robot_guidance_node:
 		self.done = False
 		self.action_check = ''
 		self.action_diff_count = 0
+		self.done = True
 
 	def callback(self, data):
 		try:
@@ -52,13 +53,16 @@ class robot_guidance_node:
 
 #		cv2.imshow("Capture Image", self.cv_image)
 		temp = copy.deepcopy(self.cv_image)
+		temp = resize(temp, (24, 32), mode='constant')
+		temp = resize(temp, (480, 640), mode='constant')
 		cv2.circle(temp, (640 / 2, 480 / 2),  100, (0, 0, 255), 2)
 		cv2.imshow("Capture Image", temp)
 		cv2.waitKey(1)
 
 	def callback_reward(self, reward):
 		self.reward = reward.data
-		img = resize(self.cv_image, (48, 64), mode='constant')
+#		img = resize(self.cv_image, (48, 64), mode='constant')
+		img = resize(self.cv_image, (24, 32), mode='constant')
 		r, g, b = cv2.split(img)
 		imgobj = np.asanyarray([r,g,b])
 
@@ -76,17 +80,16 @@ class robot_guidance_node:
 		ros_time = str(rospy.Time.now())
 		if self.learning:
 			self.count += 1
-			if self.count % 2 == 0:
-				self.done = True
-			if self.done:
+			action_test = self.rl.act(imgobj)
+			self.action = self.rl.act_and_trains(imgobj, self.reward)
+
+			if self.action != action_test:
+				self.action_check = 'action diff'
+				self.action_diff_count += 1
+
+			if self.count % 100 == 0:
 				self.rl.stop_episode_and_train(imgobj, self.reward, self.done)
-				self.done = False
-			else:
-				self.action = self.rl.act_and_trains(imgobj, self.reward)
-				action_test = self.rl.act(imgobj)
-				if self.action != action_test:
-					self.action_check = 'action diff'
-					self.action_diff_count += 1
+				print(self.rl.agent.get_statistics())
 
 
 			line = [ros_time, str(self.reward), str(self.action)]
@@ -101,7 +104,8 @@ class robot_guidance_node:
 #		cv2.putText(self.cv_image,self.action_list[self.action],(550,450), cv2.FONT_HERSHEY_SIMPLEX, 1,(0,0,255),2)
 #		image_name = self.path + self.start_time + '/' + ros_time + '.png'
 #		cv2.imwrite(image_name, self.cv_image)
-		print("learning = " + str(self.learning) + " count: " + str(self.count) + " action: " + str(self.action) + ", reward: " + str(round(self.reward,5)), self.action_check)
+		if self.reward != -10000:
+			print("learning = " + str(self.learning) + " count: " + str(self.count) + " action: " + str(self.action) + ", reward: " + str(round(self.reward,5)), self.action_check)
 #		if((self.count - 1) % 100 == 0 and self.count > 100):
 #			self.rl.save_agent()
 
