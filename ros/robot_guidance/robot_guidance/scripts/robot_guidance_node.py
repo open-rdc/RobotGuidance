@@ -61,14 +61,13 @@ class robot_guidance_node:
 
 	def callback_reward(self, reward):
 		self.reward = reward.data
-#		img = resize(self.cv_image, (48, 64), mode='constant')
-		img = resize(self.cv_image, (24, 32), mode='constant')
+		img = resize(self.cv_image, (48, 64), mode='constant')
 		r, g, b = cv2.split(img)
 		imgobj = np.asanyarray([r,g,b])
 
-		if self.learning == True and self.reward == -10000:
-			print('action diff count =', self.action_diff_count)
-			self.action_diff_count = 0
+#		if self.learning == True and self.reward == -10000:
+#			print('action diff count =', self.action_diff_count)
+#			self.action_diff_count = 0
 
 		if self.reward == -10000: #	for testing
 			self.learning = False
@@ -80,12 +79,12 @@ class robot_guidance_node:
 		ros_time = str(rospy.Time.now())
 		if self.learning:
 			self.count += 1
-			action_test = self.rl.act(imgobj)
+#			action_test = self.rl.act(imgobj)
 			self.action = self.rl.act_and_trains(imgobj, self.reward)
 
-			if self.action != action_test:
-				self.action_check = 'action diff'
-				self.action_diff_count += 1
+#			if self.action != action_test:
+#				self.action_check = 'action diff'
+#				self.action_diff_count += 1
 
 			if self.count % 100 == 0:
 				self.rl.stop_episode_and_train(imgobj, self.reward, self.done)

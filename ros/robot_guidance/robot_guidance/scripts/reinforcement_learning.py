@@ -18,6 +18,8 @@ class QFunction(chainer.Chain):
 		)
 
 	def __call__(self, x, test=False):
+		global h5
+
 		s = chainer.Variable(x)
 		h1 = F.relu(self.conv1(s))
 		h2 = F.relu(self.conv2(h1))
@@ -60,6 +62,8 @@ class reinforcement_learning:
 		print('\x1b[6;30;42m' + 'Last step in this episode' + '\x1b[0m')
 	def act(self, obs):
 		self.action = self.agent.act(obs)
+		action_prob = F.softmax(h5)
+		print(action_prob[0])
 		return self.action
 
 	def save_agent(self):
