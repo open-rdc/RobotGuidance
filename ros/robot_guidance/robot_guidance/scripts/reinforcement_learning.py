@@ -5,6 +5,7 @@ import chainer.links as L
 import numpy as np
 import os
 from os.path import expanduser
+import csv
 
 class QFunction(chainer.Chain):
 	def __init__(self, n_history=3, n_action=4):
@@ -62,9 +63,12 @@ class reinforcement_learning:
 		print('\x1b[6;30;42m' + 'Last step in this episode' + '\x1b[0m')
 	def act(self, obs):
 		self.action = self.agent.act(obs)
-		action_prob = F.softmax(h5)
-		print(action_prob[0])
-		return self.action
+		action_prob = F.softmax(h5)[0]
+		action_prob = str(action_prob).replace("variable([ ", "")
+		action_prob = action_prob.replace("variable([ ", "")
+		action_prob = action_prob.replace("])", "")
+		action_prob = map(float, action_prob.split())
+		return self.action, action_prob
 
 	def save_agent(self):
 		self.agent.save('agent')

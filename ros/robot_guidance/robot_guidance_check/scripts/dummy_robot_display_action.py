@@ -74,7 +74,7 @@ class dummy_robot:
         self.size = min(max(self.size, -size_limit), size_limit)
         self.pan = min(max(self.pan, -pan_limit), pan_limit)
         self.count += 1
-        if ((self.count % 100) == 0 and self.count >= 100000 or self.count == 100):
+        if ((self.count % 100) == 0 and self.count >= 100 or self.count == 100):
             self.display_action_mode = True
             self.display_actions_process(True)
 #            self.pan = int(np.random.rand() * 400 - 200)

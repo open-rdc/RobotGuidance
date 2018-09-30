@@ -45,6 +45,10 @@ class robot_guidance_node:
 		self.action_diff_count = 0
 		self.done = True
 
+		with open(self.path + self.start_time + '/' +  'action_prob_log.csv', 'w') as f:
+			writer = csv.writer(f, lineterminator='\n')
+			writer.writerow(['Foward', 'Right', 'Left', 'Stop'])
+
 	def callback(self, data):
 		try:
 			self.cv_image = self.bridge.imgmsg_to_cv2(data, "bgr8")
@@ -53,7 +57,7 @@ class robot_guidance_node:
 
 #		cv2.imshow("Capture Image", self.cv_image)
 		temp = copy.deepcopy(self.cv_image)
-		temp = resize(temp, (24, 32), mode='constant')
+		temp = resize(temp, (48, 64), mode='constant')
 		temp = resize(temp, (480, 640), mode='constant')
 		cv2.circle(temp, (640 / 2, 480 / 2),  100, (0, 0, 255), 2)
 		cv2.imshow("Capture Image", temp)
@@ -79,7 +83,7 @@ class robot_guidance_node:
 		ros_time = str(rospy.Time.now())
 		if self.learning:
 			self.count += 1
-#			action_test = self.rl.act(imgobj)
+#			action_test, action_prob = self.rl.act(imgobj)
 			self.action = self.rl.act_and_trains(imgobj, self.reward)
 
 #			if self.action != action_test:
@@ -96,8 +100,18 @@ class robot_guidance_node:
 				writer = csv.writer(f, lineterminator='\n')
 				writer.writerow(line)
 
+			if (self.count + 1) % 100 == 0:
+				line = [str(self.count + 1)]
+				with open(self.path + self.start_time + '/' +  'action_prob_log.csv', 'a') as f:
+					writer = csv.writer(f, lineterminator='\n')
+					writer.writerow(line)
+
 		else:
-			self.action = self.rl.act(imgobj)
+			self.action, action_prob = self.rl.act(imgobj)
+			line = action_prob
+			with open(self.path + self.start_time + '/' +  'action_prob_log.csv', 'a') as f:
+				writer = csv.writer(f, lineterminator='\n')
+				writer.writerow(line)
 		self.action_pub.publish(self.action)
 
 #		cv2.putText(self.cv_image,self.action_list[self.action],(550,450), cv2.FONT_HERSHEY_SIMPLEX, 1,(0,0,255),2)
