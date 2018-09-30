@@ -64,8 +64,8 @@ class reinforcement_learning:
 	def act(self, obs):
 		self.action = self.agent.act(obs)
 		action_prob = F.softmax(h5)[0]
-		action_prob = str(action_prob).replace("variable([ ", "")
-		action_prob = action_prob.replace("variable([ ", "")
+		action_prob = str(action_prob)
+		action_prob = action_prob.replace("variable([", "")
 		action_prob = action_prob.replace("])", "")
 		action_prob = map(float, action_prob.split())
 		return self.action, action_prob
