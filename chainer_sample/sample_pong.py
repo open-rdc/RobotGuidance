@@ -36,7 +36,7 @@ class QFunction(chainer.Chain):
 n_action = env.action_space.n
 n_history=4
 q_func = QFunction(n_history, n_action)
-#q_func.to_gpu()
+q_func.to_gpu()
 
 optimizer = chainer.optimizers.Adam(eps=1e-2)
 #optimizer = chainer.optimizers.RMSpropGraves(lr=0.00025, alpha=0.95, momentum=0.95, eps=0.0001)

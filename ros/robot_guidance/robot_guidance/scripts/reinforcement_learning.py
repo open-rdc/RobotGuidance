@@ -6,6 +6,8 @@ import numpy as np
 import os
 from os.path import expanduser
 
+save = False
+
 class QFunction(chainer.Chain):
 	def __init__(self, n_history=3, n_action=4):
 		initializer = chainer.initializers.HeNormal()
@@ -24,6 +26,12 @@ class QFunction(chainer.Chain):
 		h3 = F.relu(self.conv3(h2))
 		h4 = F.relu(self.conv4(h3))
 		h5 = self.fc5(h4)
+		global save 
+		if save:
+			p = h5.data
+			path_w = '/home/mirai/data.txt'
+			with open(path_w, mode='a') as f:
+				f.write(str(p[0][0])+", "+str(p[0][1])+", "+str(p[0][2])+", "+str(p[0][3])+"\r\n")
 		h = chainerrl.action_value.DiscreteActionValue(h5)
 		return h
 
@@ -59,7 +67,10 @@ class reinforcement_learning:
 		self.action = self.agent.stop_episode_and_train(obs, reward, done)
 		return self.action
 	def act(self, obs):
+		global save 
+		save = True
 		self.action = self.agent.act(obs)
+		save = False
 		return self.action
 
 	def save_agent(self):
