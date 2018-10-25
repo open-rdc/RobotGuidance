@@ -49,7 +49,7 @@ python sample_pong.py
 画像に対する行動選択をコンピュータ内で実行して挙動を確認
 
 ```
-roslaunch robot_guidance_check robot_guidance_check.launch
+roslaunch robot_guidance_check robot_guidance_check_display_action.launch
 
 launchファイルの説明
 robot_guidance_check_all.launch　左右前後移動の学習
