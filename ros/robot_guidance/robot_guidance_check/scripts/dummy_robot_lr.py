@@ -65,7 +65,7 @@ class dummy_robot:
             print("reward timer is too fast!")
         self.prev_count = self.count
         self.reward = self.pan
-        if self.count > 500:
+        if self.count > 1000:
             self.reward = -10000
         self.reward_pub.publish(self.reward)
 

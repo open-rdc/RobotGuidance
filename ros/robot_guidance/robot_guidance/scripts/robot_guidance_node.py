@@ -59,27 +59,37 @@ class robot_guidance_node:
 
 	def callback_reward(self, reward):
 		pos = reward.data
-		if pos > 5:
-			self.correct_action = 1
-		elif pos < -5:
-			self.correct_action = 2
-		else:
-			self.correct_action = 0
+
 		img = resize(self.cv_image, (48, 64), mode='constant')
 		r, g, b = cv2.split(img)
 		imgobj = np.asanyarray([r,g,b])
 
-		if self.reward == -10000: #	for testing
+		if pos == -10000: #	for testing
 			self.learning = False
+			self.correct_action = "none"
 		else:
 			self.learning = True
+			if pos > 5:
+				self.correct_action = 1
+			elif pos < -5:
+				self.correct_action = 2
+			else:
+				self.correct_action = 0
+
 		ros_time = str(rospy.Time.now())
 		if self.learning:
 			self.count += 1
 			if self.count % 100 == 0:
 				self.done = True
 			if self.done:
-				self.action = self.rl.stop_episode_and_train(imgobj, self.reward, self.done)
+				self.rl.stop_episode_and_train(imgobj, self.reward, self.done)
+				self.action = self.rl.act_and_trains(imgobj, self.reward)
+				if self.action == self.correct_action:
+					self.reward = 1
+					self.correct = 1
+				else:
+					self.reward = -1
+					self.correct = 0
 				self.done = False
 				print('Last step in this episode')
 			else:
@@ -90,14 +100,14 @@ class robot_guidance_node:
 				else:
 					self.reward = -1
 					self.correct = 0
-#				self.action = self.correct_action
 			line = [ros_time, str(self.reward), str(self.action)]
 			with open(self.path + self.start_time + '/' +  'reward.csv', 'a') as f:
 				writer = csv.writer(f, lineterminator='\n')
 				writer.writerow(line)
+			self.action_pub.publish(self.correct_action)
 		else:
 			self.action = self.rl.act(imgobj)
-		self.action_pub.publish(self.correct_action)
+			self.action_pub.publish(self.action)
 
 #		cv2.putText(self.cv_image,self.action_list[self.action],(550,450), cv2.FONT_HERSHEY_SIMPLEX, 1,(0,0,255),2)
 #		image_name = self.path + self.start_time + '/' + ros_time + '.png'
