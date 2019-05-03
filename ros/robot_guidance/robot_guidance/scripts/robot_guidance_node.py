@@ -69,10 +69,10 @@ class robot_guidance_node:
 			self.correct_action = "none"
 		else:
 			self.learning = True
-			if pos > 5:
-				self.correct_action = 1
-			elif pos < -5:
+                        if pos > 10:
 				self.correct_action = 2
+			elif pos < -10:
+				self.correct_action = 1
 			else:
 				self.correct_action = 0
 
