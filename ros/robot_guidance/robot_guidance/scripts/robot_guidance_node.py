@@ -27,6 +27,9 @@ class robot_guidance_node:
 		self.reward_sub = rospy.Subscriber("/reward", Float32, self.callback_reward)
 		self.action_pub = rospy.Publisher("action", Int8, queue_size=1)
 		self.action = 0
+		self.correct_action = 0
+		self.correct = 0
+		self.correct_ratio = 0
 		self.reward = 0
 		self.cv_image = np.zeros((480,640,3), np.uint8)
 		self.count = 0
@@ -55,14 +58,13 @@ class robot_guidance_node:
 		cv2.waitKey(1)
 
 	def callback_reward(self, reward):
-		self.reward = reward.data
-		self.action_ml = 0
-		if self.reward > 5:
-			self.action = 1
-		elif self.reward < -5:
-			self.action = 2
+		pos = reward.data
+		if pos > 5:
+			self.correct_action = 1
+		elif pos < -5:
+			self.correct_action = 2
 		else:
-			self.action = 0
+			self.correct_action = 0
 		img = resize(self.cv_image, (48, 64), mode='constant')
 		r, g, b = cv2.split(img)
 		imgobj = np.asanyarray([r,g,b])
@@ -77,25 +79,31 @@ class robot_guidance_node:
 			if self.count % 100 == 0:
 				self.done = True
 			if self.done:
-				self.action = self.rl.stop_episode_and_train(imgobj, 1.0, self.done)
+				self.action = self.rl.stop_episode_and_train(imgobj, self.reward, self.done)
 				self.done = False
 				print('Last step in this episode')
 			else:
-				self.action = self.rl.act_and_trains(imgobj, 1.0, self.action)
-#				self.action_ml = self.rl.act(imgobj)
+				self.action = self.rl.act_and_trains(imgobj, self.reward)
+				if self.action == self.correct_action:
+					self.reward = 1
+					self.correct = 1
+				else:
+					self.reward = -1
+					self.correct = 0
+#				self.action = self.correct_action
 			line = [ros_time, str(self.reward), str(self.action)]
 			with open(self.path + self.start_time + '/' +  'reward.csv', 'a') as f:
 				writer = csv.writer(f, lineterminator='\n')
 				writer.writerow(line)
-
 		else:
 			self.action = self.rl.act(imgobj)
-		self.action_pub.publish(self.action)
+		self.action_pub.publish(self.correct_action)
 
 #		cv2.putText(self.cv_image,self.action_list[self.action],(550,450), cv2.FONT_HERSHEY_SIMPLEX, 1,(0,0,255),2)
 #		image_name = self.path + self.start_time + '/' + ros_time + '.png'
 #		cv2.imwrite(image_name, self.cv_image)
-		print("learning = " + str(self.learning) + " count: " + str(self.count) + " action: " + str(self.action) + ", action_ml: " + str(self.action_ml))
+		self.correct_ratio = 0.97 * self.correct_ratio + 0.03 * self.correct
+		print("learning = " + str(self.learning) + " count: " + str(self.count) + " correct_action: " + str(self.correct_action) + " action: " + str(self.action) + " correct_ratio:" + str(self.correct_ratio))
 #		if((self.count - 1) % 100 == 0 and self.count > 100):
 #			self.rl.save_agent()
 

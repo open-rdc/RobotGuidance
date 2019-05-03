@@ -42,7 +42,7 @@ class dummy_robot:
             return
         self.pan += action_list[self.action]
         self.count += 1
-        if ((self.count % 50) == 1):
+        if ((self.count % 30) == 1):
             self.pan = int(np.random.rand() * 400 - 200)
             print("change pan angle")
 
@@ -65,7 +65,7 @@ class dummy_robot:
             print("reward timer is too fast!")
         self.prev_count = self.count
         self.reward = self.pan
-        if self.count > 1000:
+        if self.count > 500:
             self.reward = -10000
         self.reward_pub.publish(self.reward)
 
