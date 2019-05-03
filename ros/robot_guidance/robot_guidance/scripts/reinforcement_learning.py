@@ -39,7 +39,7 @@ class reinforcement_learning:
 		self.gamma = 0.95
 		self.n_action = n_action
 		self.explorer = chainerrl.explorers.ConstantEpsilonGreedy(
-			epsilon=0.1, random_action_func=self.action_space_sample)
+			epsilon=1.0, random_action_func=self.action_space_sample)
 		self.replay_buffer = chainerrl.replay_buffer.ReplayBuffer(capacity=10 ** 4)
 		self.phi = lambda x: x.astype(np.float32, copy=False)
 		self.agent = chainerrl.agents.DoubleDQN(
@@ -52,7 +52,8 @@ class reinforcement_learning:
 			self.agent.load('agent')
 			print('agent LOADED!!')
 
-	def act_and_trains(self, obs, reward):
+	def act_and_trains(self, obs, reward, action):
+		self.action = action
 		self.action = self.agent.act_and_train(obs, reward)
 		return self.action
 	def stop_episode_and_train(self, obs, reward, done):
@@ -67,7 +68,7 @@ class reinforcement_learning:
 		print("agent SAVED!!")
 
 	def action_space_sample(self):
-		return np.random.randint(1,self.n_action)
+		return self.action
 
 if __name__ == '__main__':
 	rl = reinforcement_learning()
