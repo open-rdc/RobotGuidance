@@ -24,9 +24,12 @@ class robot_guidance_node:
 		self.rl = reinforcement_learning(n_action = self.action_num)
 		self.bridge = CvBridge()
 		self.image_sub = rospy.Subscriber("/image_raw", Image, self.callback)
-		self.reward_sub = rospy.Subscriber("/reward", Float32, self.callback_reward)
+		self.control_sub = rospy.Subscriber("/control", Float32, self.callback_reward)
 		self.action_pub = rospy.Publisher("action", Int8, queue_size=1)
 		self.action = 0
+		self.correct_action = 0
+		self.correct = 0
+		self.correct_ratio = 0
 		self.reward = 0
 		self.cv_image = np.zeros((480,640,3), np.uint8)
 		self.count = 0
@@ -55,17 +58,15 @@ class robot_guidance_node:
 		cv2.waitKey(1)
 
 	def callback_reward(self, reward):
-		self.reward = reward.data
+		
 		img = resize(self.cv_image, (48, 64), mode='constant')
 		r, g, b = cv2.split(img)
 		imgobj = np.asanyarray([r,g,b])
 
-		if self.reward == -10000: #	for testing
+		if self.correct_action == -1: #	for testing
 			self.learning = False
 		else:
 			self.learning = True
-
-
 
 		ros_time = str(rospy.Time.now())
 		if self.learning:
@@ -75,9 +76,22 @@ class robot_guidance_node:
 			if self.done:
 				self.action = self.rl.stop_episode_and_train(imgobj, self.reward, self.done)
 				self.done = False
+				if self.action == self.correct_action:
+					self.reward = 1
+					self.correct = 1
+				else:
+					self.reward = -1
+					self.correct = 0
 				print('Last step in this episode')
 			else:
 				self.action = self.rl.act_and_trains(imgobj, self.reward)
+				if self.action == self.correct_action:
+					self.reward = 1
+					self.correct = 1
+				else:
+					self.reward = -1
+					self.correct = 0
+					
 
 			line = [ros_time, str(self.reward), str(self.action)]
 			with open(self.path + self.start_time + '/' +  'reward.csv', 'a') as f:
@@ -91,7 +105,8 @@ class robot_guidance_node:
 #		cv2.putText(self.cv_image,self.action_list[self.action],(550,450), cv2.FONT_HERSHEY_SIMPLEX, 1,(0,0,255),2)
 #		image_name = self.path + self.start_time + '/' + ros_time + '.png'
 #		cv2.imwrite(image_name, self.cv_image)
-		print("learning = " + str(self.learning) + " count: " + str(self.count) + " action: " + str(self.action) + ", reward: " + str(round(self.reward,5)))
+		self.correct_ratio = 0.97 * self.correct_ratio + 0.03 * self.correct
+		print("learning = " + str(self.learning) + " count: " + str(self.count) + " correct_action: " + str(self.correct_action) + " action: " + str(self.action) + " correct_ratio:" + str(self.correct_ratio))
 #		if((self.count - 1) % 100 == 0 and self.count > 100):
 #			self.rl.save_agent()
 
