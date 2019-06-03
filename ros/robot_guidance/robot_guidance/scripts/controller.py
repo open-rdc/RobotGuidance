@@ -6,9 +6,9 @@ import rospy
 from std_msgs.msg import Float32
 from rosserial_arduino.msg import Adc
 
-class guidance_controller:
+class robot_controller:
 	def __init__(self):
-		rospy.init_node('guidance_controller', anonymous=True)
+		rospy.init_node('robot_controller', anonymous=True)
 		self.poten_sub = rospy.Subscriber("/adc", Adc, self.callback_poten)
 		self.control_pub = rospy.Publisher('/control', Float32, queue_size=10)
 		self.poten = Adc()
@@ -40,7 +40,7 @@ class guidance_controller:
 		self.control_pub.publish(self.correct_action)
 
 if __name__ == '__main__':
-	gc = guidance_controller()
+	rc = robot_controller()
 	try:
 		rospy.spin()
 	except KeyboardInterrupt:

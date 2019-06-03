@@ -36,16 +36,16 @@ class reinforcement_learning:
 			print("No GPU")
 		self.optimizer = chainer.optimizers.Adam(eps=1e-2)
 		self.optimizer.setup(self.q_func)
-		self.gamma = 0.95
+		self.gamma = 0
 		self.n_action = n_action
 		self.explorer = chainerrl.explorers.ConstantEpsilonGreedy(
-			epsilon=0.1, random_action_func=self.action_space_sample)
+			epsilon=0, random_action_func=self.action_space_sample)
 		self.replay_buffer = chainerrl.replay_buffer.ReplayBuffer(capacity=10 ** 4)
 		self.phi = lambda x: x.astype(np.float32, copy=False)
 		self.agent = chainerrl.agents.DoubleDQN(
 			self.q_func, self.optimizer, self.replay_buffer, self.gamma, self.explorer,
 			minibatch_size=4, replay_start_size=100, update_interval=1,
-			target_update_interval=100, phi=self.phi)
+			target_update_interval=50, phi=self.phi)
 
 		home = expanduser("~")
 		if os.path.isdir(home + '/agent'):
