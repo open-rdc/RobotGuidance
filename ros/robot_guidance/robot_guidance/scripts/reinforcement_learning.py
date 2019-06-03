@@ -44,8 +44,8 @@ class reinforcement_learning:
 		self.phi = lambda x: x.astype(np.float32, copy=False)
 		self.agent = chainerrl.agents.DoubleDQN(
 			self.q_func, self.optimizer, self.replay_buffer, self.gamma, self.explorer,
-			minibatch_size=4, replay_start_size=100, update_interval=1,
-			target_update_interval=100, phi=self.phi)
+			minibatch_size=4, replay_start_size=50, update_interval=1,
+			target_update_interval=50, phi=self.phi)
 
 		home = expanduser("~")
 		if os.path.isdir(home + '/agent'):
