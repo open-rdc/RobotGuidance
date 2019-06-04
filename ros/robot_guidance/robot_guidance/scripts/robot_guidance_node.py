@@ -57,8 +57,8 @@ class robot_guidance_node:
 		cv2.imshow("Capture Image", temp)
 		cv2.waitKey(1)
 
-	def callback_reward(self, reward):
-		
+	def callback_reward(self, controller):
+		self.correct_action = controller.data
 		img = resize(self.cv_image, (48, 64), mode='constant')
 		r, g, b = cv2.split(img)
 		imgobj = np.asanyarray([r,g,b])

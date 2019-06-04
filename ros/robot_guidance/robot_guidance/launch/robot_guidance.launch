@@ -5,6 +5,6 @@
     <node pkg="robot_guidance" type="robot_move.py" name="robot_move">
     </node>
 
-    <node pkg="robot_guidance" type="guidance_reward.py" name="robot_guidance">
+    <node pkg="robot_guidance" type="controller.py" name="robot_controller">
     </node>
 </launch>
