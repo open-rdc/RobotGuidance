@@ -75,13 +75,7 @@ class robot_guidance_node:
 				self.done = True
 			if self.done:
 				self.action = self.rl.stop_episode_and_train(imgobj, self.reward, self.done)
-				self.done = False
-#				if self.action == self.correct_action:
-#					self.reward = 1
-#					self.correct = 1
-#				else:
-#					self.reward = -1
-#					self.correct = 0
+                                self.done = False
 				print('Last step in this episode')
 			else:
 				self.action = self.rl.act_and_trains(imgobj, self.reward)
@@ -91,7 +85,6 @@ class robot_guidance_node:
 				else:
 					self.reward = -1
 					self.correct = 0
-					
 
 			line = [ros_time, str(self.reward), str(self.action)]
 			with open(self.path + self.start_time + '/' +  'reward.csv', 'a') as f:
@@ -101,7 +94,7 @@ class robot_guidance_node:
 
 		else:
 			self.action = self.rl.act(imgobj)
-		self.action_pub.publish(self.action)
+		        self.action_pub.publish(self.action)
 
 #		cv2.putText(self.cv_image,self.action_list[self.action],(550,450), cv2.FONT_HERSHEY_SIMPLEX, 1,(0,0,255),2)
 #		image_name = self.path + self.start_time + '/' + ros_time + '.png'

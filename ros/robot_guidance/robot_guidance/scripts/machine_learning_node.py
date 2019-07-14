@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 from __future__ import print_function
 import roslib
-roslib.load_manifest('machine_learning')
+roslib.load_manifest('robot_guidance')
 import rospy
 import cv2
 from sensor_msgs.msg import Image
@@ -24,7 +24,7 @@ class machine_learning_node:
 		self.dl = deep_learning(n_action = self.action_num)
 		self.bridge = CvBridge()
 		self.image_sub = rospy.Subscriber("/image_raw", Image, self.callback)
-		self.action_sub = rospy.Subscriber("/control", Int8, queue_size=1)
+		self.action_sub = rospy.Subscriber("/control", Float32, queue_size=1)
 		self.action_pub = rospy.Publisher("action", Int8, queue_size=1)
 		self.action = 0
 		self.cv_image = np.zeros((480,640,3), np.uint8)
@@ -71,11 +71,11 @@ class machine_learning_node:
 			if self.count % 100 == 0:
 				self.done = True
 			if self.done:
-				self.action = self.ml.stop_episode_and_train(imgobj, self.correct_action, self.done)
+				self.action = self.dl.stop_episode_and_train(imgobj, self.correct_action, self.done)
 				self.done = False
 				print('Last step in this episode')
 			else:
-				self.action = self.ml.act_and_trains(imgobj, self.correct_action)
+				self.action = self.dl.act_and_trains(imgobj, self.correct_action)
 
 			line = [ros_time, str(self.reward), str(self.action)]
 			with open(self.path + self.start_time + '/' +  'reward.csv', 'a') as f:
@@ -84,7 +84,7 @@ class machine_learning_node:
 
 #		else:
 #			self.action = self.rl.act(imgobj)
-		self.action_pub.publish(self.action)
+		self.action_pub.publish(self.correct_action)
 
 #		cv2.putText(self.cv_image,self.action_list[self.action],(550,450), cv2.FONT_HERSHEY_SIMPLEX, 1,(0,0,255),2)
 #		image_name = self.path + self.start_time + '/' + ros_time + '.png'
@@ -95,7 +95,7 @@ class machine_learning_node:
 
 
 if __name__ == '__main__':
-	dl = deep_learning()
+	ml = machine_learning_node()
 	try:
 		rospy.spin()
 	except KeyboardInterrupt:
