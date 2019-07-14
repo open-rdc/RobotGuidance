@@ -76,12 +76,12 @@ class robot_guidance_node:
 			if self.done:
 				self.action = self.rl.stop_episode_and_train(imgobj, self.reward, self.done)
 				self.done = False
-				if self.action == self.correct_action:
-					self.reward = 1
-					self.correct = 1
-				else:
-					self.reward = -1
-					self.correct = 0
+#				if self.action == self.correct_action:
+#					self.reward = 1
+#					self.correct = 1
+#				else:
+#					self.reward = -1
+#					self.correct = 0
 				print('Last step in this episode')
 			else:
 				self.action = self.rl.act_and_trains(imgobj, self.reward)
