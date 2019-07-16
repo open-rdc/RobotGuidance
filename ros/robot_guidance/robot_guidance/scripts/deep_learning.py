@@ -62,7 +62,6 @@ class CNN(chainer.Chain):
 class deep_learning:
     def __init__(self, n_channel=3, n_action=3):
         self.n_action = n_action
-        self.n_channel = n_channel
         self.cnn = CNN(n_channel, n_action)
         self.optimizer = chainer.optimizers.Adam(eps=1e-2)
         self.optimizer.setup(self.cnn)
@@ -95,7 +94,7 @@ class deep_learning:
                 x_train_batch = imgobj[index,:]
                 t_train_batch = correct_action[index]
 
-                y_train_batch = net(x_train_batch)
+                y_train_batch = self.cnn(x_train_batch)
 
                 loss_train_batch = F.softmax_cross_entropy(y_train_batch, t_train_batch)
                 accuracy_train_batch = F.accuracy(y_train_batch, t_train_batch)
@@ -103,7 +102,7 @@ class deep_learning:
                 loss_list.append(loss_train_batch.array)
                 accuracy_list.append(accuracy_train_batch.array)
 
-                net.cleargrads()
+                self.cnn.cleargrads()
                 loss_train_batch.backward()
 
                 optimizer.update()
@@ -114,7 +113,7 @@ class deep_learning:
             accuracy_train = np.mean(accuracy_list)
 
             with chainer.using_config('train', False), chainer.using_config('enable_backprop', False):
-                y_val = net(x_val)
+                y_val = self.cnn(x_val)
 
             loss_val = F.softmax_cross_entropy(y_val, t_val)
             accuracy_val = F.accuracy(y_val, t_val)
@@ -126,8 +125,12 @@ class deep_learning:
             results_train['accuracy'] .append(accuracy_train)
             results_valid['loss'].append(loss_val.array)
             results_valid['accuracy'].append(accuracy_val.array)
-            
-            n_action = y_val
+            chainer.serializers.save_npz('my_iris.net', self.cnn)
+
+            self.n_action = y_val
+
+        return self.action
+
 #	def act(self, obs):
 #		with chainer.using_config('train', False), chainer.using_config('enable_backprop', False);
 
