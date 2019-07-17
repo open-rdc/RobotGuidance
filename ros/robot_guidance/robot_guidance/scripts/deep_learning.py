@@ -7,17 +7,14 @@ import matplotlib as plt
 from collections import namedtuple
 import os
 from os.path import expanduser
-'''
-Transition = namedtuple(
-    'Transition',(state, action, next_state)
-)
 
 # HYPER PARAM
-MAX_STEPS = 200
+
 NUM_EPISODE = 500
 BATCH_SIZE = 32
-CAPACITY = 10000
-
+#CAPACITY = 10000
+#MAX_STEPS = 200
+'''
 class ReplayMemory:
 
     def __init__(self,CAPACITY):
@@ -61,15 +58,14 @@ class CNN(chainer.Chain):
 
 class deep_learning:
     def __init__(self, n_channel=3, n_action=3):
-        self.n_action = n_action
         self.cnn = CNN(n_channel, n_action)
         self.optimizer = chainer.optimizers.Adam(eps=1e-2)
         self.optimizer.setup(self.cnn)
-
+        self.n_action = n_action
 
     def act_and_trains(self, imgobj, correct_action):
 
-        n_epoch = MAX_STEPS
+        n_epoch = NUM_EPISODE
         n_batchsize = BATCH_SIZE
         iteration = 0
 
@@ -127,7 +123,7 @@ class deep_learning:
             results_valid['accuracy'].append(accuracy_val.array)
             chainer.serializers.save_npz('my_iris.net', self.cnn)
 
-            self.n_action = y_val
+            self.action = y_val
 
         return self.action
 

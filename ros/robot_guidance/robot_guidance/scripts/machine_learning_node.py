@@ -8,7 +8,7 @@ from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
 from deep_learning import *
 from skimage.transform import resize
-from std_msgs.msg import Float32, Int8
+from std_msgs.msg import Int8
 import sys
 import skimage.transform
 import csv
@@ -24,10 +24,13 @@ class machine_learning_node:
 		self.dl = deep_learning(n_action = self.action_num)
 		self.bridge = CvBridge()
 		self.image_sub = rospy.Subscriber("/image_raw", Image, self.callback)
-		self.action_sub = rospy.Subscriber("/control", Float32, queue_size=1)
-		self.action_pub = rospy.Publisher("action", Int8, queue_size=1)
+		self.control_sub = rospy.Subscriber("/control", Int8, self.callback_learning)
+                self.action_pub = rospy.Publisher("action", Int8, queue_size=1)
 		self.action = 0
-		self.cv_image = np.zeros((480,640,3), np.uint8)
+		self.correct_action = 0
+                self.correct = 0
+                self.correct_ratio = 0
+                self.cv_image = np.zeros((480,640,3), np.uint8)
 		self.count = 0
 		self.learning = True
 		self.start_time = time.strftime("%Y%m%d_%H:%M:%S")
@@ -68,14 +71,7 @@ class machine_learning_node:
 		ros_time = str(rospy.Time.now())
 		if self.learning:
 			self.count += 1
-			if self.count % 100 == 0:
-				self.done = True
-			if self.done:
-				self.action = self.dl.stop_episode_and_train(imgobj, self.correct_action, self.done)
-				self.done = False
-				print('Last step in this episode')
-			else:
-				self.action = self.dl.act_and_trains(imgobj, self.correct_action)
+			self.action = self.dl.act_and_trains(imgobj, self.correct_action)
 
 			line = [ros_time, str(self.correct_action), str(self.action)]
 			with open(self.path + self.start_time + '/' +  'action.csv', 'a') as f:
@@ -89,9 +85,9 @@ class machine_learning_node:
 #		cv2.putText(self.cv_image,self.action_list[self.action],(550,450), cv2.FONT_HERSHEY_SIMPLEX, 1,(0,0,255),2)
 #		image_name = self.path + self.start_time + '/' + ros_time + '.png'
 #		cv2.imwrite(image_name, self.cv_image)
-
-		self.correct_ratio = 0.97 * self.correct_ratio + 0.03 * self.correct
-		print("learning = " + str(self.learning) + " count: " + str(self.count) + " correct_action: " + str(self.correct_action) + " action: " + str(self.action) + " correct_ratio:" + str(self.correct_ratio))
+#                print(imgobj)
+#		self.correct_ratio = 0.97 * self.correct_ratio + 0.03 * self.correct
+		print("learning = " + str(self.learning) + " count: " + str(self.count) + " correct_action: " + str(self.correct_action) + " action: " + str(self.action))
 #		if((self.count - 1) % 100 == 0 and self.count > 100):
 #			self.rl.save_agent()
 
