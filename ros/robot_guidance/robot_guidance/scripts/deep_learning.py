@@ -41,37 +41,39 @@ class deep_learning:
         self.n_action = n_action
         self.phi = lambda x: x.astype(np.float32, copy=False)
 
-    def act_and_trains(self, imgobj, correct_action):
+    def act_and_trains(self, imgobj, correct_action, done):
+      
+        if done:
+            x = [self.phi(s) for s in [imgobj]]
+            t = np.array([correct_action], np.int32)
+            dataset = TupleDataset(x, t)
+            train_iter = SerialIterator(dataset, batch_size = BATCH_SIZE, repeat=True, shuffle=False)
         
-        x = [self.phi(s) for s in [imgobj]]
-        t = np.array([correct_action], np.int32)
-        dataset = TupleDataset(x, t)
-        train_iter = SerialIterator(dataset, batch_size = BATCH_SIZE, repeat=True, shuffle=False)
+            count = 1
+
+            results_train = {}
+            results_train['loss'], results_train['accuracy'] = [], []
         
-        count = 1
+            for epoch in range(NUM_EPISODE):
+                train_batch  = train_iter.next()
+                x_train, t_train = chainer.dataset.concat_examples(train_batch, -1)
 
-        results_train = {}
-        results_train['loss'], results_train['accuracy'] = [], []
+                y_train = self.net(x_train)
+
+                loss_train = F.softmax_cross_entropy(y_train, t_train)
+                acc_train = F.accuracy(y_train, t_train)
+                self.net.cleargrads()
+                loss_train.backward()
+                self.optimizer.update()
         
-        for epoch in range(NUM_EPISODE):
-            train_batch  = train_iter.next()
-            x_train, t_train = chainer.dataset.concat_examples(train_batch, -1)
+                count += 1
 
-            y_train = self.net(x_train)
+                results_train['loss'] .append(loss_train.array)
+                results_train['accuracy'] .append(acc_train.array)
 
-            loss_train = F.softmax_cross_entropy(y_train, t_train)
-            acc_train = F.accuracy(y_train, t_train)
-            self.net.cleargrads()
-            loss_train.backward()
-            self.optimizer.update()
-
-            count += 1
-
-            print('epoch: {}, iteration: {}, loss (train): {:.4f}, acc (train): {:.4f}'.format(epoch, count, loss_train.array.mean(), acc_train.array.mean()))
-
-            results_train['loss'] .append(loss_train.array)
-            results_train['accuracy'] .append(acc_train.array)
-
+                action = np.argmax(y_train.array)
+            print('epoch: {}, iteration: {}, loss (train): {:.4f}, acc (train): {:.4f}, action: {}'.format(epoch, count, loss_train.array.mean(), acc_train.array.mean(), action))
+            
             return action
 
     def act(self, imgobj):

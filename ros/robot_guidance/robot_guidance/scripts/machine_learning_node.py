@@ -70,8 +70,13 @@ class machine_learning_node:
                 ros_time = str(rospy.Time.now())
 		if self.learning:
 			self.count += 1
-			self.action = self.dl.act_and_trains(imgobj, self.correct_action)
-                
+                        if self.count % 50 == 0:
+				self.done = True
+			if self.done:
+				self.action = self.dl.act_and_trains(imgobj, self.correct_action, self.done)
+                                self.done = False
+				print('Last step in this episode')
+
 			line = [ros_time, str(self.correct_action), str(self.action)]
 			with open(self.path + self.start_time + '/' +  'action.csv', 'a') as f:
 				writer = csv.writer(f, lineterminator='\n')
