@@ -2,49 +2,26 @@ import chainer
 import chainer.functions as F
 import chainer.links as L
 from chainer import Chain, variable
+from chainer.datasets import TupleDataset
+from chainer.iterators import SerialIterator
 import numpy as np
 import matplotlib as plt
-from collections import namedtuple
 import os
 from os.path import expanduser
 
 # HYPER PARAM
-
-NUM_EPISODE = 500
+NUM_EPISODE = 100
 BATCH_SIZE = 32
-#CAPACITY = 10000
-#MAX_STEPS = 200
-'''
-class ReplayMemory:
 
-    def __init__(self,CAPACITY):
-        self.capacity = CAPACITY
-        self.memory = []
-        self.index = 0
-
-    def push(self,state,action,next_state):
-        if len(self.memory) < self.capacity:
-            self.memory.append(None)
-
-        self.memory[self.index] = Transition(state, action, next_state)
-        self.index = (self.index + 1) % self.capacity
-
-    def sample(self, batch_size):
-        return ramdom.sample(self.memory, batch_size)
-
-    def __len__(self):
-        return len(self.memory)
-'''
-
-class CNN(chainer.Chain):
+class Net(chainer.Chain):
     def __init__(self, n_channel=3, n_action=3):
         initializer = chainer.initializers.HeNormal()
-        super(CNN, self).__init__(
+        super(Net, self).__init__(
             conv1=L.Convolution2D(n_channel, 32, ksize=8, stride=4, nobias=False, initialW=initializer),
             conv2=L.Convolution2D(32, 64, ksize=3, stride=2, nobias=False, initialW=initializer),
             conv3=L.Convolution2D(64, 64, ksize=3, stride=1, nobias=False, initialW=initializer),
             conv4=L.Linear(960, 512, initialW=initializer),
-            fc5=L.Linear(512, n_action, initialW=np.zeros((n_action, 512), dtype=np.float32))
+            fc5=L.Linear(512, n_action, initialW=np.zeros((n_action, 512), dtype=np.int32))
         )
 
     def __call__(self, x, test=False):
@@ -58,77 +35,52 @@ class CNN(chainer.Chain):
 
 class deep_learning:
     def __init__(self, n_channel=3, n_action=3):
-        self.cnn = CNN(n_channel, n_action)
+        self.net = Net(n_channel, n_action)
         self.optimizer = chainer.optimizers.Adam(eps=1e-2)
-        self.optimizer.setup(self.cnn)
+        self.optimizer.setup(self.net)
         self.n_action = n_action
+        self.phi = lambda x: x.astype(np.float32, copy=False)
 
     def act_and_trains(self, imgobj, correct_action):
+        
+        x = [self.phi(s) for s in [imgobj]]
+        t = np.array([correct_action], np.int32)
+        dataset = TupleDataset(x, t)
+        train_iter = SerialIterator(dataset, batch_size = BATCH_SIZE, repeat=True, shuffle=False)
+        
+        count = 1
 
-        n_epoch = NUM_EPISODE
-        n_batchsize = BATCH_SIZE
-        iteration = 0
+        results_train = {}
+        results_train['loss'], results_train['accuracy'] = [], []
+        
+        for epoch in range(NUM_EPISODE):
+            train_batch  = train_iter.next()
+            x_train, t_train = chainer.dataset.concat_examples(train_batch, -1)
 
-        results_train = {
-            'loss': [],
-            'accuracy': []
-        }
-        results_valid = {
-            'loss': [],
-            'accuracy': []
-        }
+            y_train = self.net(x_train)
 
-        for epoch in range(n_epoch):
+            loss_train = F.softmax_cross_entropy(y_train, t_train)
+            acc_train = F.accuracy(y_train, t_train)
+            self.net.cleargrads()
+            loss_train.backward()
+            self.optimizer.update()
 
-            order = np.random.permutation(range(len(imgobj)))
+            count += 1
 
-            loss_list = []
-            accuracy_list = []
+            print('epoch: {}, iteration: {}, loss (train): {:.4f}, acc (train): {:.4f}'.format(epoch, count, loss_train.array.mean(), acc_train.array.mean()))
 
-            for i in range(0, len(order), n_batchsize):
-                index = order[i:i+n_batchsize]
-                x_train_batch = imgobj[index,:]
-                t_train_batch = correct_action[index]
+            results_train['loss'] .append(loss_train.array)
+            results_train['accuracy'] .append(acc_train.array)
 
-                y_train_batch = self.cnn(x_train_batch)
+            return action
 
-                loss_train_batch = F.softmax_cross_entropy(y_train_batch, t_train_batch)
-                accuracy_train_batch = F.accuracy(y_train_batch, t_train_batch)
-
-                loss_list.append(loss_train_batch.array)
-                accuracy_list.append(accuracy_train_batch.array)
-
-                self.cnn.cleargrads()
-                loss_train_batch.backward()
-
-                optimizer.update()
-
-                iteration += 1
-
-            loss_train = np.mean(loss_list)
-            accuracy_train = np.mean(accuracy_list)
-
+    def act(self, imgobj):
+            x = [self.phi(s) for s in [imgobj]]
+            x_test = chainer.dataset.concat_examples(x, -1)
             with chainer.using_config('train', False), chainer.using_config('enable_backprop', False):
-                y_val = self.cnn(x_val)
-
-            loss_val = F.softmax_cross_entropy(y_val, t_val)
-            accuracy_val = F.accuracy(y_val, t_val)
-
-            print('epoch: {}, iteration: {}, loss (train): {:.4f}, loss (valid): {:.4f}'.format(
-            epoch, iteration, loss_train, loss_val.array))
-
-            results_train['loss'] .append(loss_train)
-            results_train['accuracy'] .append(accuracy_train)
-            results_valid['loss'].append(loss_val.array)
-            results_valid['accuracy'].append(accuracy_val.array)
-            chainer.serializers.save_npz('my_iris.net', self.cnn)
-
-            self.action = y_val
-
-        return self.action
-
-#	def act(self, obs):
-#		with chainer.using_config('train', False), chainer.using_config('enable_backprop', False);
-
+                action_value = self.net(x_test)
+                action = np.argmax(action_value.array)
+            return action
+                
 if __name__ == '__main__':
         dl = deep_learning()
