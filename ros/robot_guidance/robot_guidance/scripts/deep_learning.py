@@ -74,7 +74,7 @@ class deep_learning:
     def act(self, imgobj):
             x = [self.phi(s) for s in [imgobj]]
             x_test = chainer.dataset.concat_examples(x, -1)
-            A
+            
             with chainer.using_config('train', False), chainer.using_config('enable_backprop', False):
                 action_value = self.net(x_test)
                 action = np.argmax(action_value.array)
