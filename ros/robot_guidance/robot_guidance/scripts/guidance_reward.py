@@ -26,7 +26,6 @@ class guidance_reward:
 			#	for testing
 			self.reward = -10000
 		else:
-#			self.reward_fb = 1.0 - self.poten.adc2/60.0 - self.poten.adc3/2.0
 			self.reward_lr = 1.0 - (self.poten.adc0 + self.poten.adc1)/30.0
 			self.reward = self.reward_fb + self.reward_lr ** 3
 
