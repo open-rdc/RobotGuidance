@@ -6,6 +6,11 @@
     <node pkg="robot_guidance" type="robot_move.py" name="robot_move">
     </node>
 
+<<<<<<< HEAD
     <node pkg="robot_guidance" type="guidance_reward.py" name="guidance_reward">
+=======
+    <node pkg="robot_guidance" type="controller.py" name="robot_controller">
+>>>>>>> masaya
     </node>
+
 </launch>
