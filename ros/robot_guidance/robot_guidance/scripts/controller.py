@@ -12,7 +12,6 @@ class robot_controller:
 		self.poten_sub = rospy.Subscriber("/adc", Adc, self.callback_poten)
 		self.control_pub = rospy.Publisher('/control', Int32, queue_size=10)
 		self.poten = Adc()
-#		self.action = 0
 #		self.pitch = 0
 #		self.yaw = 0
 
@@ -33,8 +32,6 @@ class robot_controller:
 				self.correct_action = 1
 			else:
 				self.correct_action = 0
-
-#		print 'LR = ', round(self.control, 2), '\tcontrol = ', round(self.control, 2)
 
 		#Publish the correct_action
 		self.control_pub.publish(self.correct_action)
