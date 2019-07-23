@@ -1,16 +1,16 @@
 <launch>
-    <include file="$(find robot_guidance)/launch/interaction_robot.launch">
-    </include>
-
-    <include file="$(find robot_guidance)/launch/uvc_camera_node0.launch">
-    </include>
 
     <node pkg="robot_guidance" type="robot_guidance_node.py" name="robot_guidance_node" output="screen">
     </node>
 
-    <node pkg="robot_guidance" type="robot_move.py" name="robot_move" output="screen">
+    <node pkg="robot_guidance" type="robot_move.py" name="robot_move">
     </node>
 
-    <node pkg="robot_guidance" type="guidance_reward.py" name="guidance_reward" output="screen">
+<<<<<<< HEAD
+    <node pkg="robot_guidance" type="guidance_reward.py" name="guidance_reward">
+=======
+    <node pkg="robot_guidance" type="controller.py" name="robot_controller">
+>>>>>>> masaya
     </node>
+
 </launch>

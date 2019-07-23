@@ -1,0 +1,10 @@
+<launch>
+    <node pkg="robot_guidance" type="machine_learning_node.py" name="machine_learning_node" output="screen">
+    </node>
+
+    <node pkg="robot_guidance" type="robot_move.py" name="robot_move">
+    </node>
+
+    <node pkg="robot_guidance" type="controller.py" name="robot_controller">
+    </node>
+</launch>

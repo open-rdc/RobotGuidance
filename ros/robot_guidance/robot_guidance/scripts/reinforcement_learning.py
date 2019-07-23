@@ -14,7 +14,7 @@ class QFunction(chainer.Chain):
 			conv2=L.Convolution2D(32, 64, ksize=3, stride=2, nobias=False, initialW=initializer),
 			conv3=L.Convolution2D(64, 64, ksize=3, stride=1, nobias=False, initialW=initializer),
 			conv4=L.Linear(960, 512, initialW=initializer),
-			fc5=L.Linear(512, n_action, initialW=np.zeros((n_action, 512), dtype=np.float32))
+			fc5=L.Linear(512, n_action, initialW=np.zeros((n_action, 512), dtype=np.int32))
 		)
 
 	def __call__(self, x, test=False):
@@ -36,16 +36,27 @@ class reinforcement_learning:
 			print("No GPU")
 		self.optimizer = chainer.optimizers.Adam(eps=1e-2)
 		self.optimizer.setup(self.q_func)
-		self.gamma = 0.95
+<<<<<<< HEAD
+		self.gamma = 0.0
 		self.n_action = n_action
 		self.explorer = chainerrl.explorers.ConstantEpsilonGreedy(
-			epsilon=0.1, random_action_func=self.action_space_sample)
+			epsilon=0.0, random_action_func=self.action_space_sample)
+=======
+		self.gamma = 0
+		self.n_action = n_action
+		self.explorer = chainerrl.explorers.ConstantEpsilonGreedy(
+			epsilon=0, random_action_func=self.action_space_sample)
+>>>>>>> masaya
 		self.replay_buffer = chainerrl.replay_buffer.ReplayBuffer(capacity=10 ** 4)
 		self.phi = lambda x: x.astype(np.float32, copy=False)
 		self.agent = chainerrl.agents.DoubleDQN(
 			self.q_func, self.optimizer, self.replay_buffer, self.gamma, self.explorer,
+<<<<<<< HEAD
+			minibatch_size=4, replay_start_size=50, update_interval=1,
+=======
 			minibatch_size=4, replay_start_size=100, update_interval=1,
-			target_update_interval=100, phi=self.phi)
+>>>>>>> masaya
+			target_update_interval=50, phi=self.phi)
 
 		home = expanduser("~")
 		if os.path.isdir(home + '/agent'):
@@ -67,7 +78,7 @@ class reinforcement_learning:
 		print("agent SAVED!!")
 
 	def action_space_sample(self):
-		return np.random.randint(1,self.n_action)
+		return self.action
 
 if __name__ == '__main__':
 	rl = reinforcement_learning()

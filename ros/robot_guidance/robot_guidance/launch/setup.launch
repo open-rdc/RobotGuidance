@@ -1,0 +1,18 @@
+<launch>
+<<<<<<< HEAD
+=======
+
+>>>>>>> masaya
+    <include file="$(find robot_guidance)/launch/interaction_robot.launch">
+    </include>
+
+    <include file="$(find robot_guidance)/launch/uvc_camera_node1.launch">
+    </include>
+
+    <node pkg="rosserial_python" type="serial_node.py" name="serial_node">
+    </node>
+<<<<<<< HEAD
+=======
+
+>>>>>>> masaya
+</launch>
