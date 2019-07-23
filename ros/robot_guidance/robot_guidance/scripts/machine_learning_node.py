@@ -35,7 +35,6 @@ class machine_learning_node:
 		self.learning = True
 		self.start_time = time.strftime("%Y%m%d_%H:%M:%S")
 		self.action_list = ['Front', 'Right', 'Left', 'Back', 'Stop']
-		#self.path = '/home/pete/cit-1808/research_pic/'
 		self.path = 'cit-1808/research_pic/'
 		os.makedirs(self.path + self.start_time)
 
