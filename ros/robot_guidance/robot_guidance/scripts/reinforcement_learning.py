@@ -14,7 +14,7 @@ class QFunction(chainer.Chain):
 			conv2=L.Convolution2D(32, 64, ksize=3, stride=2, nobias=False, initialW=initializer),
 			conv3=L.Convolution2D(64, 64, ksize=3, stride=1, nobias=False, initialW=initializer),
 			conv4=L.Linear(960, 512, initialW=initializer),
-			fc5=L.Linear(512, n_action, initialW=np.zeros((n_action, 512), dtype=np.float32))
+			fc5=L.Linear(512, n_action, initialW=np.zeros((n_action, 512), dtype=np.int32))
 		)
 
 	def __call__(self, x, test=False):
