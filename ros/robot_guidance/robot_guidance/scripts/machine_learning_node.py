@@ -28,8 +28,6 @@ class machine_learning_node:
                 self.action_pub = rospy.Publisher("action", Int8, queue_size=1)
 		self.action = 0
 		self.correct_action = 0
-                self.correct = 0
-                self.correct_ratio = 0
                 self.cv_image = np.zeros((480,640,3), np.uint8)
 		self.count = 0
 		self.learning = True
@@ -38,9 +36,9 @@ class machine_learning_node:
 		self.path = 'cit-1808/research_pic/'
 		os.makedirs(self.path + self.start_time)
 
-		with open(self.path + self.start_time + '/' +  'action.csv', 'w') as f:
+		with open(self.path + self.start_time + '/' +  'accuracy.csv', 'w') as f:
 			writer = csv.writer(f, lineterminator='\n')
-			writer.writerow(['rostime', 'control', 'action'])
+			writer.writerow(['rostime', 'episode', 'accuracy'])
 
 	def callback(self, data):
 		try:
@@ -69,8 +67,9 @@ class machine_learning_node:
 		if self.learning:
                         self.count += 1
 			self.action = self.dl.act_and_trains(imgobj, self.correct_action)
-			line = [ros_time, str(self.correct_action), str(self.action)]
-			with open(self.path + self.start_time + '/' +  'action.csv', 'a') as f:
+			self.accuracy = self.dl.result()
+                        line = [ros_time, str(self.count), str(self.accuracy)]
+			with open(self.path + self.start_time + '/' +  'accuracy.csv', 'a') as f:
 				writer = csv.writer(f, lineterminator='\n')
 				writer.writerow(line)
 		        self.action_pub.publish(self.correct_action)
@@ -80,7 +79,7 @@ class machine_learning_node:
                         self.action = self.dl.act(imgobj)
                         self.action_pub.publish(self.action)
 
-		print("learning = " + str(self.learning) + " count: " + str(self.count) + " correct_action: " + str(self.correct_action) + " action: " + str(self.action))
+                print("learning = " + str(self.learning) + " count: " + str(self.count) + " correct_action: " + str(self.correct_action) + " action: " + str(self.action) + " accuracy: " + str(self.accuracy) )
 
 
 if __name__ == '__main__':
