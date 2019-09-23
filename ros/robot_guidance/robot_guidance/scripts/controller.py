@@ -24,11 +24,9 @@ class robot_controller:
 			#	for testing
 			self.correct_action = -1
 		else:
-			self.control = self.poten.adc0 - self.poten.adc1 -20
-			
-			if self.control > 10:
+			if self.poten.adc0 > 10:
 				self.correct_action = 2
-			elif self.control < -10:
+			elif self.poten.adc1 > 10:
 				self.correct_action = 1
 			else:
 				self.correct_action = 0
