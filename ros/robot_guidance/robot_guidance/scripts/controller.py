@@ -20,17 +20,18 @@ class robot_controller:
 		self.control = 0
 		self.correct_action = 0
 
-		if self.poten.adc2 > 120:
+		if self.poten.adc2 > 200:
 			#	for testing
 			self.correct_action = -1
 		else:
-			if self.poten.adc0 > 10:
+			if self.poten.adc0 > 10 and 85 <=self.poten.adc2 <=200 :
 				self.correct_action = 2
-			elif self.poten.adc1 > 10:
+			elif self.poten.adc1 > 10 and 85 <= self.poten.adc2 <= 200:
 				self.correct_action = 1
-			else:
-				self.correct_action = 0
-
+                        elif self.poten.adc2 < 85:
+				self.correct_action = 3
+                        else:
+                                self.correct_action = 0
 		#Publish the correct_action
 		self.control_pub.publish(self.correct_action)
 
