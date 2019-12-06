@@ -1,0 +1,10 @@
+<launch>
+	<node pkg="robot_guidance" type="cloning_node.py" name="cloning_node" output="screen">
+	</node>
+
+	<node pkg="robot_guidance" type="robot_move.py" name="robot_move">
+	</node>
+
+	<node pkg="robot_guidance" type="controller.py" name="robot_controller">
+	</node>
+</launch>
