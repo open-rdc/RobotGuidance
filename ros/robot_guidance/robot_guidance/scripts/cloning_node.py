@@ -25,22 +25,20 @@ class cloning_node:
 		self.bridge = CvBridge()
 		self.image_sub = rospy.Subscriber("/image_raw", Image, self.callback)
 		self.control_sub = rospy.Subscriber("/control", Int32, self.callback_learning)
-                self.action_pub = rospy.Publisher("action", Int8, queue_size=1)
+		self.action_pub = rospy.Publisher("action", Int8, queue_size=1)
 		self.action = 0
 		self.correct_action = 0
-                self.correct = 0
-                self.correct_ratio = 0
-                self.cv_image = np.zeros((480,640,3), np.uint8)
+		self.cv_image = np.zeros((480,640,3), np.uint8)
 		self.count = 0
 		self.learning = True
 		self.start_time = time.strftime("%Y%m%d_%H:%M:%S")
-		self.action_list = ['Front', 'Right', 'Left', 'Back', 'Stop']
+		self.action_list = ['Front', 'Right', 'Left']
 		self.path = 'cit-1808/research_pic/'
 		os.makedirs(self.path + self.start_time)
 
-		with open(self.path + self.start_time + '/' +  'action.csv', 'w') as f:
+		with open(self.path + self.start_time + '/' +  'accuracy.csv', 'w') as f:
 			writer = csv.writer(f, lineterminator='\n')
-			writer.writerow(['rostime', 'control', 'action'])
+			writer.writerow(['rostime', 'episode', 'action'])
 
 	def callback(self, data):
 		try:
@@ -65,22 +63,21 @@ class cloning_node:
 		else:
 			self.learning = True
 		
-                ros_time = str(rospy.Time.now())
+		ros_time = str(rospy.Time.now())
 		if self.learning:
-                        self.count += 1
+			self.count += 1
 			self.action = self.dl.act_and_trains(imgobj, self.correct_action)
-			line = [ros_time, str(self.correct_action), str(self.action)]
+			self.accuracy = self.dl.result()
+			line = [ros_time, str(self.count), str(self.accuracy)]
 			with open(self.path + self.start_time + '/' +  'action.csv', 'a') as f:
 				writer = csv.writer(f, lineterminator='\n')
 				writer.writerow(line)
-		        self.action_pub.publish(self.correct_action)
-                
-                
-                else:
-                        self.action = self.dl.act(imgobj)
-                        self.action_pub.publish(self.action)
+			self.action_pub.publish(self.correct_action)
+		else:
+			self.action = self.dl.act(imgobj)
+			self.action_pub.publish(self.action)
 
-		print("learning = " + str(self.learning) + " count: " + str(self.count) + " correct_action: " + str(self.correct_action) + " action: " + str(self.action))
+		print("learning = " + str(self.learning) + " count: " + str(self.count) + " correct_action: " + str(self.correct_action) + " action: " + str(self.action)+ " accuracy: " + str(self.accuracy))
 
 
 if __name__ == '__main__':
