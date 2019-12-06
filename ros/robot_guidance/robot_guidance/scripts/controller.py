@@ -20,13 +20,13 @@ class robot_controller:
 		self.control = 0
 		self.correct_action = 0
 
-		if self.poten.adc2 > 120:
+		if self.poten.adc2 > 200:
 			#	for testing
 			self.correct_action = -1
 		else:
-			if self.poten.adc1 > 10:
+			if self.poten.adc0 > 10:
 				self.correct_action = 2
-			elif self.poten.adc0 > 10:
+			elif self.poten.adc1 > 10:
 				self.correct_action = 1
 			else:
 				self.correct_action = 0
