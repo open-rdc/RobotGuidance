@@ -20,7 +20,6 @@ class robot_move:
 	def callback_action(self, data):
 		self.action = data.data
 
-		# [velocity (m/s), angular velocity(rad/s)]
 		velocity = [[linear_vel, 0.0], [linear_vel, -angle_vel], [linear_vel, angle_vel], [-linear_vel, 0.0], [0.0, 0,0]]
 		self.vel_msg.linear.x = velocity[self.action][0]
 		self.vel_msg.angular.z = velocity[self.action][1]
