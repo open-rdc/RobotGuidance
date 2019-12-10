@@ -22,7 +22,7 @@ class guidance_reward:
 		self.reward_lr = 0
 		self.reward = 0
 
-		if self.poten.adc2 > 120:
+		if self.poten.adc2 > 200:
 			#	for testing
 			self.reward = -10000
 		else:
