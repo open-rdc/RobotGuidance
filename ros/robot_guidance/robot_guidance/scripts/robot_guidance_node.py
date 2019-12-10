@@ -50,7 +50,7 @@ class robot_guidance_node:
 
 #		cv2.imshow("Capture Image", self.cv_image)
 		temp = copy.deepcopy(self.cv_image)
-		cv2.circle(temp, (640 / 2, 480 / 2),  100, (0, 0, 255), 2)
+		cv2.circle(temp, (640 / 2, 480 / 2), 100, (0, 0, 255), 2)
 		cv2.imshow("Capture Image", temp)
 		cv2.waitKey(1)
 
@@ -86,6 +86,7 @@ class robot_guidance_node:
 
 		else:
 			self.action = self.rl.act(imgobj)
+		
 		self.action_pub.publish(self.action)
 
 #		cv2.putText(self.cv_image,self.action_list[self.action],(550,450), cv2.FONT_HERSHEY_SIMPLEX, 1,(0,0,255),2)
