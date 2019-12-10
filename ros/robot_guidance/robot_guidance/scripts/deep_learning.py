@@ -52,6 +52,7 @@ class deep_learning:
 			x = [self.phi(s) for s in [imgobj]]
 			t = np.array([correct_action], np.int32)
 			dataset = TupleDataset(x, t)
+
 			train_iter = SerialIterator(dataset, batch_size = BATCH_SIZE, repeat=True, shuffle=False)
 			train_batch  = train_iter.next()
 			x_train, t_train = chainer.dataset.concat_examples(train_batch, -1)
