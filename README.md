@@ -64,3 +64,18 @@ rosbag record -a
 roscore
 rostopic echo -b FILE.bag -p /TOPIC_NAME > FILE.csv
 ```
+### simple controllerによる学習　20/11/29追加
+
+Deep Learning
+```
+roslaunch robot_guidance_check robot_guidance_check_dl.launch
+```
+
+https://youtu.be/KDSkP_7GAXg
+
+Joystick
+```
+roslaunch robot_guidance_check robot_guidance_check_joy.launch
+```
+
+https://youtu.be/UrEx80zfJ7M
